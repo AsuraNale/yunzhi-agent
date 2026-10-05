@@ -224,3 +224,50 @@ def canon(value):
     if isinstance(value, str):
         return norm_text(value)
     return value
+
+
+# ---- 第九轮:还在等用户定的报告类型卡 / 决定卡(hook.py 拦推进、card.py 拦出确认卡,用的是同一份判法) ----
+# 回答过的卡(同 yzlib.CARD_CLOSED;测试核两边一致)
+CARD_CLOSED = ("answered", "skipped", "changed", "unclear", "error")
+CHOICE_KINDS = ("report_type", "decision")
+# 只写了意见、没选选项的回答记成的 result(同 card.NOTE_RESULTS)
+NOTE_RESULTS = ("not_approved", "note")
+WAITING_SAID = {"unanswered": "卡还没回答", "note": "用户只写了意见、没选选项", "skipped": "卡收起来了",
+                "unclear": "回答没认出来，还没问清"}
+
+
+def waiting_choice_card(events):
+    """一个项目的卡片记录 → 最近出的那张卡是报告类型卡或决定卡、而用户还没在上面选定一项时:
+    (出卡记录, unanswered / note / skipped / unclear);否则 (None, None)。
+    「还没选定」= 这张卡后面没有一条选了某一项的回答(answered 且 choice 不是空的):出了还没回答(unanswered);
+    最后一条回答只写了意见、没选选项(note);收起来了(skipped);回答没认出来(unclear)。其中「只有一条记录、是只写了意见或
+    收起来」的,这张卡还能再回答一次(同 card.reopen_reason,测试核两边一致);别的要重新出卡问清 —— 但不管哪种,
+    这件事都还没定。只看最近出的那张:之后出过别的卡就不算了。
+    10-04 第二次全程试跑:决定卡收到「这个缺口我也没办法，你看着办」(只写了意见),助手接着写资料汇编、推进进度、
+    去出资料汇编卡 —— 用户什么都没选。"""
+    last_i = None
+    for i, e in enumerate(events):
+        if e.get("type") == "prepared":
+            last_i = i
+    if last_i is None:
+        return None, None
+    last = events[last_i]
+    if last.get("kind") not in CHOICE_KINDS:
+        return None, None
+    cid = last.get("card_id")
+    closing = [e for e in events[last_i + 1:] if e.get("card_id") == cid and e.get("type") in CARD_CLOSED]
+    if any(c.get("type") == "answered" and c.get("choice") is not None for c in closing):
+        return None, None                       # 用户在卡上(或回数字)选定了一项
+    if not closing:
+        return last, "unanswered"
+    c = closing[-1]
+    if c.get("type") == "skipped":
+        return last, "skipped"
+    if c.get("type") == "answered" and c.get("result") in NOTE_RESULTS:
+        return last, "note"
+    return last, "unclear"
+
+
+def project_waiting_card(project_dir):
+    """projects/<项目名>/records/cards.jsonl → waiting_choice_card 的结果。"""
+    return waiting_choice_card(read_jsonl(os.path.join(project_dir, "records", "cards.jsonl")))

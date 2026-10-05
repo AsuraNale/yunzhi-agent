@@ -53,7 +53,8 @@ Once you approve the workspace's hooks in Codex, `agent-tools/hook.py` enforces 
   - The non-blocking `request_user_input_async` tool is refused.
 - **Confirmation records:** these can only be written through the card script. Direct writes to records or to approval fields are refused.
 - **Review:** the reviewer agent must be started with `fork_turns: "none"`, and the main agent cannot send it messages.
-- **Final reply:** the last reply of each turn is scanned for internal file links, skill names and jargon. A reply that fails is sent back once to be rephrased.
+- **Waiting for you:** while a choice card is still waiting for your answer, the assistant cannot move the project to the next step.
+- **Final reply:** the last reply of each turn is scanned for internal file links, skill names, jargon and talk about how the tools work. A reply that fails is sent back once to be rephrased.
 
 If the hooks are not approved, they don't run, and the assistant relies on the written rules alone.
 
@@ -69,7 +70,7 @@ If the hooks are not approved, they don't run, and the assistant relies on the w
 1. Clone this repository.
 2. Install the packages: `py -m pip install -r toolkit/requirements.txt`.
 3. Open the folder as a project in the Codex desktop app, and trust it when asked. Project settings and hooks only load in trusted folders.
-4. Start a new chat. The first time, Codex asks you to review the workspace's hooks: approve them.
+4. Start a new chat and approve the hooks: in the message box, click the **Review hooks** icon (its tooltip shows how many hooks are waiting for approval) and choose **Allow all**. Codex doesn't open this review on its own, and the hooks don't run until you approve them.
 5. Send `新建项目：<topic>。<what you need, for example length and audience>`, and attach any materials you have.
 6. Answer the cards as they come.
 7. To continue a project later, start a new chat and say `接着做`.
@@ -91,7 +92,7 @@ py -X utf8 tests/mutation_check.py
 py -X utf8 -m pytest -q toolkit/scripts
 ```
 
-- The first command runs the workspace tests, about 600 of them.
+- The first command runs the workspace tests, about 700 of them.
 - The second breaks each check on purpose and confirms that a test catches it.
 - The third runs the toolkit's own tests.
 

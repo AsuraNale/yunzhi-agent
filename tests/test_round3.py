@@ -240,7 +240,8 @@ def test_dossier_with_gaps_needs_a_decision_since_the_plan_was_confirmed(world):
     res, _ = card.answer(MAIN, dec["card_id"], ans(dec["card_id"], "缺的再找找看"))     # 只写了意见、没选:不算
     assert res["result"] == "note"
     out, rc = prepare_dossier()
-    assert rc == 1 and "先用决定卡问用户" in out["refuse"]
+    # 第九轮:这张决定卡还在等用户定(只写了意见),资料汇编卡出不来 —— 先报这一条(比「先用决定卡问用户」更准)
+    assert rc == 1 and "还有一件事在等用户定" in out["refuse"] and dec["card_id"] in out["refuse"]
     dec, rc = card.prepare("decision", MAIN, {"question": "两个缺口怎么处理？", "why": "2021 年分县数据和乡镇桩使用率都查不到。",
                                               "options": [{"label": "先写已有的部分", "effect": "缺的写进资料缺口。", "changes_plan": False},
                                                           {"label": "改研究范围", "effect": "去掉需要这两项的判断。", "changes_plan": True}]})

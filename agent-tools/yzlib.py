@@ -90,6 +90,35 @@ def clean_agent_tmp(project):
     return not os.path.exists(path)
 
 
+# 交给脚本的几份临时文件(脚本读完就删;留下的就是没用上的)
+INBOX_FILES = ("request.md", "fields.json", "answer.txt")
+
+
+def clean_inbox(project):
+    """交付之后清掉这个项目交给脚本的临时文件夹 projects/_inbox/<项目名>/(第九轮:交付后留着一个空文件夹)→ 清了没有。
+    只在里面是空的、或者只剩没用上的那几份临时文件(request.md、fields.json、answer.txt)时清;有别的东西就不动。
+    别的项目的文件夹、共用的 projects/_inbox/ 本身都不动(别的对话可能正在用)。"""
+    name = project_name(project)
+    if not name or name in (".", "..", PICK_INBOX) or os.path.basename(name) != name:
+        return False
+    path = os.path.join(shared_inbox(), name)
+    if not os.path.isdir(path):
+        return False
+    try:
+        names = os.listdir(path)
+    except OSError:
+        return False
+    if any(n not in INBOX_FILES or not os.path.isfile(os.path.join(path, n)) for n in names):
+        return False
+    try:
+        for n in names:
+            os.remove(os.path.join(path, n))
+        os.rmdir(path)
+    except OSError:
+        return False
+    return True
+
+
 def file_url(path):
     """file:/// 地址:正斜杠,中文照原样(10-02 实测的写法);只转义 % 空格 # ? 这几个会让地址断开的字符。"""
     p = os.path.normpath(os.path.abspath(path)).replace("\\", "/")

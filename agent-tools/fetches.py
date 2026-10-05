@@ -14,6 +14,9 @@
       别的 4xx、5xx、超时、连不上、超过大小上限;查了但没有内容 empty:打开了、一个字节都没有)。
       10-04 实测:Windows PowerShell 5.1 的 Invoke-WebRequest 两次都报「基础连接已经关闭」(它默认的 TLS 设置),
       同一个网站 Python 拿到了 200 —— 所以不用 Invoke-WebRequest / curl 下载,用这一条。
+      第九轮:下载到的网页是反爬虫的验证页(很小、几乎没有正文、带 EO_Bot_Ssid / Just a moment / 请开启 JavaScript
+      这类标记,或者只有一段写 cookie 再跳转的脚本)→ 不存原件,记成打不开(blocked),next 叫助手用网页工具打开读。
+      --file 交来的网页也一样核。
   $PY agent-tools/fetches.py save "<项目名>" --file "<下载好的文件>" --url "<网址>" [--title "<资料标题>"]
       第五轮 M4:从网上取来的一份资料(网页、PDF、Word、Excel、图……)存进 projects/<项目名>/fetched/originals/,
       顺手转成文字放 fetched/converted/(和用户材料同一套判法:已转成文字 / 没能读出文字 / 没转成 / 这种格式不能转),
@@ -116,7 +119,8 @@ def write_index(project):
 
 
 def save(project, file, url, title=None):
-    """存一份取来的资料 → (记录, 是不是从 inputs/ 挪过来的)。"""
+    """存一份取来的资料 → (记录, 是不是从 inputs/ 挪过来的)。
+    第九轮:网页是反爬虫的验证页(challenge_reason)→ 不存,抛 Fetched(blocked)由调用方照五态记下。"""
     import shutil
     import projects as projects_mod
     src = os.path.abspath(file or "")
@@ -126,6 +130,11 @@ def save(project, file, url, title=None):
     url = (url or "").strip()
     if not url:
         raise UsageError("要写 --url（这份资料是从哪个网址取来的）")
+    if os.path.splitext(src)[1].lower() in (".html", ".htm") and os.path.getsize(src) <= CHALLENGE_MAX_BYTES:
+        with io.open(src, "rb") as f:
+            reason = challenge_reason(f.read())
+        if reason:
+            raise Fetched("blocked", reason, challenge=True)
     orig_dir = os.path.join(project, yzlib.FETCHED, "originals")
     conv_dir = os.path.join(project, yzlib.FETCHED, "converted")
     os.makedirs(orig_dir, exist_ok=True)
@@ -172,10 +181,61 @@ GENERIC_TYPES = ("", "application/octet-stream", "binary/octet-stream", "applica
 
 
 class Fetched(Exception):
-    """下载没成:state 是五态里的一种(blocked / failed / empty),detail 说具体是什么(给助手看)。"""
-    def __init__(self, state, detail, status=None):
+    """下载没成:state 是五态里的一种(blocked / failed / empty),detail 说具体是什么(给助手看)。
+    challenge:网站给的是反爬虫的验证页(第九轮)。"""
+    def __init__(self, state, detail, status=None, challenge=False):
         super().__init__(detail)
-        self.state, self.detail, self.status = state, detail, status
+        self.state, self.detail, self.status, self.challenge = state, detail, status, challenge
+
+
+# ---- 第九轮:反爬虫的验证页(要浏览器跑脚本才放行),不是正文 ----
+# 10-04 第二次全程试跑:人社部的一页下载下来是 987 字节的 JS cookie 验证页(带 EO_Bot_Ssid),被存成原件、记成「查了但没有内容」,
+# 资料缺口卡和计数都以为部门那页没数据。这种页记成「打不开」(blocked),不存原件,next 叫助手用网页工具打开读。
+CHALLENGE_MAX_BYTES = 100 * 1024       # 很小
+CHALLENGE_TEXT_MAX = 200               # 可见文字很少(去掉脚本、样式、标签和空白之后的字数)
+CHALLENGE_BARE_TEXT = 50               # 几乎没有可见文字:只剩一段写 cookie 再跳转 / 重新载入的脚本,也算
+# (去掉空白、转成小写之后找的样子, 报给助手看的写法)
+CHALLENGE_MARKERS = (
+    ("eo_bot_ssid", "EO_Bot_Ssid"), ("__tst_status", "__tst_status"),
+    ("cdn-cgi/challenge", "cdn-cgi/challenge"), ("challenge-platform", "challenge-platform"), ("_cf_chl", "_cf_chl"),
+    ("cf-browser-verification", "cf-browser-verification"), ("justamoment", "Just a moment"),
+    ("checkingyourbrowser", "Checking your browser"), ("checkingifthesiteconnectionissecure", "Checking if the site connection is secure"),
+    ("enablejavascriptandcookies", "Enable JavaScript and cookies"), ("ddosprotectionby", "DDoS protection by"),
+    ("请开启javascript", "请开启 JavaScript"), ("请启用javascript", "请启用 JavaScript"), ("请打开javascript", "请打开 JavaScript"),
+    ("开启浏览器的javascript", "开启浏览器的 JavaScript"),
+)
+
+
+def visible_text(html_text):
+    """网页里看得见的字:去掉脚本、样式、标签和全部空白(实体照常解开)。"""
+    import html as html_mod
+    import re
+    t = re.sub(r"<(script|style|noscript)\b[^>]*>.*?</\1\s*>", " ", html_text, flags=re.S | re.I)
+    t = re.sub(r"<!--.*?-->", " ", t, flags=re.S)
+    t = re.sub(r"<[^>]+>", " ", t)
+    return re.sub(r"\s+", "", html_mod.unescape(t))
+
+
+def challenge_reason(data):
+    """一份网页(字节)是不是反爬虫的验证页 → 给助手看的一句说明(带认出的标记);不是 → None。
+    判法:很小(≤100 KB)、可见文字很少(≤200 字),而且带验证页的标记(EO_Bot_Ssid、cdn-cgi/challenge、Just a moment、
+    Checking your browser、请开启 JavaScript……);或者可见文字几乎没有(≤50 字)、只有一段写 cookie 再跳转 / 重新载入的脚本
+    (10-04 那一页的脚本是混淆过的,字面上没有 document.cookie=,但有 cookie 和 location.href)。"""
+    import re
+    if not data or len(data) > CHALLENGE_MAX_BYTES:
+        return None
+    text = data.decode("utf-8", errors="replace")
+    seen = visible_text(text)
+    if len(seen) > CHALLENGE_TEXT_MAX:
+        return None
+    flat = re.sub(r"\s+", "", text).lower()
+    for needle, shown in CHALLENGE_MARKERS:
+        if needle in flat:
+            return "网站给的是要浏览器跑脚本才放行的验证页（反爬虫），不是正文（认出：%s）" % shown
+    scripts = " ".join(m.group(0) for m in re.finditer(r"<script\b[^>]*>.*?</script\s*>", text, flags=re.S | re.I)).lower()
+    if len(seen) <= CHALLENGE_BARE_TEXT and "cookie" in scripts and any(k in scripts for k in ("location", "settimeout", "reload")):
+        return "网站给的是要浏览器跑脚本才放行的验证页（反爬虫），不是正文（认出：没有正文，只有一段写 cookie 再跳转的脚本）"
+    return None
 
 
 class NotAccepted(Exception):
@@ -279,6 +339,10 @@ def download(url, timeout=DOWNLOAD_TIMEOUT, max_mb=DOWNLOAD_MAX_MB):
             ext = _zip_kind(data)
     if ext is None:
         raise NotAccepted("这种类型不收（%s）" % (ctype or "服务器没说是什么类型"))
+    if ext == ".html":
+        reason = challenge_reason(data)
+        if reason:
+            raise Fetched("blocked", reason, status, challenge=True)
     if url_ext not in SAME_KIND.get(ext, (ext,)):
         name = (stem if url_ext in KNOWN_EXTS or not url_ext else name) + ext
     return data, name, {"status": status, "content_type": ctype, "bytes": len(data)}
@@ -294,12 +358,7 @@ def save_from_url(project, url, title=None, timeout=DOWNLOAD_TIMEOUT, max_mb=DOW
     try:
         data, filename, info = download(url, timeout, max_mb)
     except Fetched as f:
-        rec = add(project, url, f.state, "下载：%s" % f.detail)
-        return {"ok": True, "downloaded": False, "fetch_state": f.state, "detail": f.detail, "recorded": rec,
-                "next": ("没下载成（%s：%s），已经照实记下了。能用网页工具打开就用网页工具读：读到了，跑 $PY \"agent-tools/fetches.py\" add "
-                         "\"%s\" --url \"%s\" --state ok 记下重新取到了，再照常做卡；读不到，就把这个网址记进相关资料卡片的来源"
-                         "（fetch_state: %s），要的数据别处也找不到就写一张资料缺口卡。不要换成 Invoke-WebRequest 或 curl 再下一遍。"
-                         % (SAID[f.state], f.detail, name, url, f.state))}
+        return not_saved_reply(project, url, f)
     except NotAccepted as n:
         return {"ok": True, "downloaded": False, "fetch_state": None, "detail": str(n),
                 "next": ("下载到了，但%s：没存。网页内容用网页工具直接读（读到的网页不用存）；读不了，就照实记 $PY \"agent-tools/fetches.py\" "
@@ -314,6 +373,24 @@ def save_from_url(project, url, title=None, timeout=DOWNLOAD_TIMEOUT, max_mb=DOW
         shutil.rmtree(tmp, ignore_errors=True)
     rec["download"] = info
     return {"ok": True, "downloaded": True, "saved": rec, "next": saved_next(rec, False, downloaded=True)}
+
+
+def not_saved_reply(project, url, f):
+    """没存下来(下载没成,或者网站给的是验证页)→ 照五态记进 records/fetches.jsonl,返回给助手的 JSON。"""
+    name = yzlib.project_name(project)
+    rec = add(project, url, f.state, ("%s" if f.challenge else "下载：%s") % f.detail)
+    if f.challenge:
+        nxt = ("%s：已经记成打不开（blocked），没存原件。用网页工具打开这个网址读：读到了，跑 $PY \"agent-tools/fetches.py\" add "
+               "\"%s\" --url \"%s\" --state ok 记下重新取到了，再照常做卡（用网页工具读到的网页不用存）；读不到，资料卡片上这个来源照实写 "
+               "blocked（打不开，不是查了没内容），要的数据别处也找不到就写一张资料缺口卡。不要换成 Invoke-WebRequest 或 curl 再下一遍。"
+               % (f.detail, name, url))
+    else:
+        nxt = ("没下载成（%s：%s），已经照实记下了。能用网页工具打开就用网页工具读：读到了，跑 $PY \"agent-tools/fetches.py\" add "
+               "\"%s\" --url \"%s\" --state ok 记下重新取到了，再照常做卡；读不到，就把这个网址记进相关资料卡片的来源"
+               "（fetch_state: %s），要的数据别处也找不到就写一张资料缺口卡。不要换成 Invoke-WebRequest 或 curl 再下一遍。"
+               % (SAID[f.state], f.detail, name, url, f.state))
+    return {"ok": True, "downloaded": False, "saved": False, "fetch_state": f.state, "challenge": f.challenge,
+            "detail": f.detail, "recorded": rec, "next": nxt}
 
 
 def saved_next(rec, moved, downloaded=False):
@@ -360,7 +437,10 @@ def _main(argv):
     if args.cmd == "save":
         if not args.file:
             return yzlib.emit(save_from_url(project, args.url, args.title, args.timeout, args.max_mb))
-        rec, moved = save(project, args.file, args.url, args.title)
+        try:
+            rec, moved = save(project, args.file, args.url, args.title)
+        except Fetched as f:            # 第九轮:网站给的是验证页 —— 不存,记成打不开
+            return yzlib.emit(not_saved_reply(project, args.url, f))
         return yzlib.emit({"ok": True, "saved": rec, "next": saved_next(rec, moved)})
     if args.cmd == "add":
         if args.state == "ok" and latest_states(project).get(args.url.strip()) not in FAILED_STATES:

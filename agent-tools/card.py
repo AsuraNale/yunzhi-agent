@@ -168,6 +168,13 @@ HEADERS = {"report_type": "报告类型", "delivery": "交付确认", "decision"
 NOTE_RESULTS = ("not_approved", "note")
 # 一张卡还能再回答一次的两种情况(第五轮 H2 收起;第七轮 只写了意见),对用户、对助手各怎么说
 REOPEN_WORDS = {"skipped": "收起来", "note": "只写了意见、没选选项"}
+# 第九轮:报告类型卡 / 决定卡还在等用户定(没答、只写了意见、收起来了)时,不出确认类的卡(判法在 sessions.waiting_choice_card,
+# 守门脚本拦推进用的是同一份)。10-04 第二次全程试跑:决定卡只收到「你看着办」,助手就写了资料汇编、推进了进度、去出资料汇编卡。
+CONFIRM_FLOW_KINDS = ("task_plan", "dossier", "outline", "delivery")
+WAITING_REFUSE = ("还有一件事在等用户定（%s，卡 %s：%s）：先把这件事问清 —— 卡还能再回答的，说 card.py answer 输出的 say 里"
+                  "那句（里面写着回哪个数字；卡还没发出去，就照它的 prepare 输出发卡），然后停下等用户回，他回了数字或选项名，照 note-user "
+                  "的提示跑 card.py answer；卡已经关了的（回答没认出来，或者已经再答过一次），重新跑 card.py prepare 出那张卡。"
+                  "定下来之后再出这张卡。不要按猜的选择（哪怕是你推荐的那一项）去写材料、推进进度。")
 
 
 class Refuse(Exception):
@@ -605,7 +612,53 @@ def dossier_rule_problems(project, meta, plan_meta, genre):
             out.append("资料汇编要写找反面证据的记录（counter_search：每条 {query: 怎么找、在哪找, result: 找到了什么、没找到什么, "
                        "found: [这次找到、做成卡的卡号]}，至少一条）：研判型要专门找过不支持核心判断的资料")
         out += counter_found_problems(project, cs)
+        out += counter_query_problems(project, cs)
     out += card_rule_problems(project, genre)
+    return out
+
+
+# ---- 第九轮:反向检索是事后补写的(10-04 第二次全程试跑:两条查询词里带着已经找到的数字「…同比增长 54.97%」「…新增缴费客户 300万」) ----
+# 带单位的具体数字:百分比、万、亿(全角半角归一后比,中间的空白不算)。年份、编号这类不带单位的数不算。
+UNIT_NUMBER_RE = re.compile(r"([0-9]+(?:\.[0-9]+)?)\s*(%|万|亿)")
+
+
+def unit_numbers(text):
+    """一段文字里带单位的具体数字 → {「54.97%」「300万」…}。"""
+    if not isinstance(text, str):
+        return set()
+    t = unicodedata.normalize("NFKC", text)
+    return {m.group(1) + m.group(2) for m in UNIT_NUMBER_RE.finditer(t)}
+
+
+def counter_query_problems(project, cs):
+    """反向检索记录的查询词(query / where)里出现了找到的卡(found)上摘录或数值里的具体数字 → 退回:
+    那是拿已经找到的结果去搜(事后补写的记录),不是在找和判断相反的说法。"""
+    cards = {str(c.get("uid") or fn): c for c, fn in (load_live_cards(project) or [])}
+    found_numbers = set()
+    for x in cs if isinstance(cs, list) else []:
+        if not isinstance(x, dict) or not isinstance(x.get("found"), list):
+            continue
+        for u in x["found"]:
+            c = cards.get(str(u).strip())
+            if not c:
+                continue
+            for s in c.get("sources") or []:
+                if isinstance(s, dict):
+                    found_numbers |= unit_numbers(s.get("excerpt"))
+            for f in c.get("facts") or []:
+                if isinstance(f, dict):
+                    found_numbers |= unit_numbers(f.get("value"))
+    out = []
+    for i, x in enumerate(cs if isinstance(cs, list) else [], start=1):
+        if not isinstance(x, dict):
+            continue
+        query = " ".join(str(x.get(k)) for k in ("query", "where") if isinstance(x.get(k), str))
+        hits = sorted(unit_numbers(query) & found_numbers)
+        if hits:
+            out.append("反向检索记录第 %d 条的查询词里有已经找到的数字（%s）：反向检索要搜和判断相反的说法，不是拿已经找到的数字去搜。"
+                       "补做一次真正的反向检索（搜和核心判断相反的说法，例如没有增长、下降、低于预期、效果不明显），把那次怎么搜、在哪搜、"
+                       "找到了什么照实写进 counter_search（找到的做成卡、卡号写进 found）；这一条是事后拿结果去搜的，不要留着充数"
+                       % (i, "、".join(hits)))
     return out
 
 
@@ -1419,6 +1472,11 @@ def prepare(kind, project_arg, fields, card_id=None, mode=None, pane_open=False)
             messy = yzlib.hygiene_problems(project)
             if messy:
                 raise Refuse(messy)
+        if project and kind in CONFIRM_FLOW_KINDS:
+            waiting, why = sessions.waiting_choice_card(log)
+            if waiting:
+                raise Refuse([WAITING_REFUSE % (waiting.get("title") or waiting.get("kind"), waiting.get("card_id"),
+                                                sessions.WAITING_SAID[why])])
         if kind == "report_type":
             card = build_report_type(project, fields)
         elif kind in ("task_plan", "dossier", "outline"):
@@ -2084,6 +2142,9 @@ def answer_confirm(project, prepared, chosen, note, at=None):
         # 第八轮:交付之后,助手自己临时用的 .yz-tmp/<项目名>/ 清掉(脚本自己的临时文件夹不动)
         if yzlib.clean_agent_tmp(project):
             effects.append({"cmd": "清掉 .yz-tmp/%s/" % pname})
+        # 第九轮:交给脚本的临时文件夹 projects/_inbox/<项目名>/ 也清掉(空的、或只剩没用上的临时文件时)
+        if yzlib.clean_inbox(project):
+            effects.append({"cmd": "清掉 projects/_inbox/%s/" % pname})
     nexts = {
         "task_plan": "确认记录已写好，进度推进到收集资料（PROGRESS.md 已记了一行，不用你记）。说 say 里那句交接的话，然后加载 evidence-card 开始收集资料。",
         "dossier": "确认记录已写好，进度推进到%s%s（PROGRESS.md 已记了一行）。说 say 里那句交接的话，然后加载 %s。" % (
@@ -2135,14 +2196,33 @@ def doc_label(data):
     return "%s第 %s 版" % (name, v) if name and v is not None else (name or "这一版")
 
 
+def recommended_option(data, options):
+    """报告类型卡、决定卡上推荐的那一项 → (卡上的编号(从 1 数), 选项);没推荐 → (None, None)。
+    推荐的那一项排在卡上第一个(recommended_first),编号照卡上的顺序数。"""
+    rec = (data or {}).get("recommend")
+    if rec is None or isinstance(rec, bool):
+        return None, None
+    for i, o in enumerate(options or [], start=1):
+        if str(o.get("key")) == str(rec):
+            return i, o
+    return None, None
+
+
 def note_only_say(kind, data, options):
     """只写了意见、没选选项之后对用户说的那一句(第七轮):末尾一定说怎么继续(回哪个数字)。
-    10-04 冒烟:说法里没有「怎么继续」,用户不知道可以直接回 1;守门脚本打回重说的那版也把它丢了。"""
+    10-04 冒烟:说法里没有「怎么继续」,用户不知道可以直接回 1;守门脚本打回重说的那版也把它丢了。
+    第九轮:报告类型卡、决定卡上有推荐的那一项,直接把推荐说出来(用户说「你看着办」时他要的就是这个),
+    但只是推荐 —— 定不定、选哪个,还是等用户回数字(10-04 第二次全程试跑:助手照自己猜的选择接着干了)。"""
     if kind == "delivery":
         return "成稿还没交付：你写的话算意见，不算交付。要按这一版交付，直接回 1 就行；要改的话告诉我改哪里。"
     if kind == "flow_change":
         return "流程还没改：你写的话算意见，不算确认。要按新的流程走，直接回 1 就行；还按原来的流程走，就回 2。"
     if kind in ("report_type", "decision"):
+        n, rec = recommended_option(data, options)
+        if rec is not None:
+            whose = "报告类型你让我来定的话" if kind == "report_type" else "你让我来定的话"
+            return ("你写的我记下了。%s，我建议选 %d，%s。要按这个办，回 %d 就行；想选别的，回对应的数字：%s。"
+                    % (whose, n, (rec.get("base") or rec.get("label") or "").strip(), n, numbered_options(options)))
         what = "要定报告类型" if kind == "report_type" else "要定下来"
         return "你写的我记下了。%s，直接回选项前面的数字就行：%s。" % (what, numbered_options(options))
     return "%s还没定下来：你写的话算意见，不算确认。要按这一版定下来，直接回 1 就行；要改的话告诉我改哪里。" % doc_label(data)
@@ -2199,12 +2279,14 @@ def note_only_next(kind, data, note):
     if kind in ("report_type", "decision"):
         what = "成稿叫法、核心判断" if kind == "report_type" else "问法或选项（例如提了别的做法）"
         return (head + "这张卡还没定。看意见是什么：① 要改卡上的%s：说 say_revise 里那句，改好重新出卡（出了新卡，这张就不能再回答了）；"
-                "② 其余（补充、问题、想法）：先用一句研究上的话回应意见，再说 say 里那句（里面列着选项的编号），停下等用户。"
-                "看得出用户想选哪一项也不要替他选，等他自己回数字。" % what) + reopen_next(kind)
+                "② 其余（补充、问题、「你看着办」这类想让你来定的话）：先用一句研究上的话回应意见，再说 say 里那句"
+                "（有推荐的，里面已经写着推荐哪一项、回哪个数字），说完就结束这一轮。"
+                "推荐可以说，替用户选不行：不按猜的选择（哪怕是你推荐的那一项）去写材料、推进进度、出下一张卡 —— "
+                "这张卡定下来之前，确认类的卡出不来，守门脚本在跑时推进也会被拦。等用户自己回数字。" % what) + reopen_next(kind)
     return (head + "这算「先不确认」，没有写确认记录（用户的话都是意见，只有选了确认那一项才算）。看意见里说没说要改什么："
             "① 说了（例如「时间段改成 2021 年开始」）：说 say_revise 里那句，再%s（改了材料，这张卡就不能再回答了）；"
             "② 没说（例如「直接帮我确认吧」「这版可以」，或者只是问了个问题）：不改材料，先用一句研究上的话回应意见，"
-            "再说 say 里那句，停下等用户。" % NOTE_REVISE_TODO[kind]) + reopen_next(kind)
+            "再说 say 里那句，说完就结束这一轮：不推进、不出下一张卡，等用户回数字。" % NOTE_REVISE_TODO[kind]) + reopen_next(kind)
 
 
 def selected_say(kind, chosen, note):

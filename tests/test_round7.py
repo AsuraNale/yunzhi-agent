@@ -362,7 +362,11 @@ def test_note_only_say_ends_with_how_to_continue(world, kind, stage, fields):
     say = res["say"]
     if kind in ("report_type", "decision"):
         first = out["ask"]["questions"][0]["options"][0]["label"]
-        assert "直接回选项前面的数字就行" in say and ("1 %s" % first) in say
+        assert ("1 %s" % first) in say
+        if fields.get("recommend") is not None:     # 第九轮:有推荐的,直接说推荐哪一项、回哪个数字
+            assert "我建议选 1" in say and "回 1 就行" in say
+        else:
+            assert "直接回选项前面的数字就行" in say
     else:
         assert "直接回 1 就行" in say
         if kind in ("task_plan", "dossier", "outline"):

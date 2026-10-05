@@ -32,7 +32,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pipeline_lib import (PLACEHOLDER_RE, count_inline_citations, load_references,
+from pipeline_lib import (PLACEHOLDER_RE, count_inline_citations, count_live_cards, load_references,
                           split_table, take_doc_title,
                           norm_tier, number_entries, read_md)
 
@@ -304,8 +304,15 @@ def render(draft_path, refs_path, out_path, title=None, theme=DEFAULT_THEME, car
     cells = [("章节", str(len(toc))), ("文内引用", str(total_cites)),
              ("参考来源", str(len(numbered)))]
     if cards_dir and os.path.isdir(cards_dir):
-        n_cards = len([f for f in os.listdir(cards_dir) if f.endswith(".md")])
-        cells.insert(2, ("资料卡片", str(n_cards)))   # 云织 Agent 分支(10-03):用词表的说法
+        # 云织 Agent 分支(10-04 第九轮):只数在用的资料卡片,作废的(deprecated: true)不算 —— 口径同交付前检查 ⑩
+        # (pipeline_lib.count_live_cards)。原来数的是 cards/ 里全部 .md:第二次全程试跑在用 17 张,网页版顶上写成了 19。
+        # 卡片读不出来就不显示这一格(取不到不编;卡片的毛病由 card_check 报)。
+        try:
+            n_cards = count_live_cards(cards_dir)
+        except Exception:  # noqa: BLE001
+            n_cards = None
+        if n_cards is not None:
+            cells.insert(2, ("资料卡片", str(n_cards)))   # 云织 Agent 分支(10-03):用词表的说法
     meta_html = "".join('<div><div class="k">%s</div><div class="v">%s</div></div>' % kv
                         for kv in cells)
 

@@ -15,12 +15,14 @@ Codex 没信任这份 hooks 时它根本不跑:一切照 AGENTS.md 靠说明,car
   ② 起子助手(collaborationspawn_agent):fork_turns 不是 "none" 就拒(只在独立复核时起子助手,复核不带写作对话);
      第八轮:协作工具只放行起、等、列出(spawn_agent / wait_agent / list_agents),给子助手发消息、追加任务、打断
      (send_message / followup_task / interrupt_agent,以及协作命名空间里不认识的)一律拒;
-  ③ shell:stamp.py 写确认记录的参数(--approve 等)、推进到助手不该推进的状态;往卡片和消息记录、交付记录、守门记录、
+  ③ shell:stamp.py 写确认记录的参数(--approve 等)、推进到助手不该推进的状态、这个项目还有报告类型卡或决定卡在等用户定时
+     推进(第九轮);往卡片和消息记录、交付记录、守门记录、
      工具与说明里写;先 cd 再跑 toolkit / agent-tools 的脚本;改会话号和云织开关的环境变量;
   ④ apply_patch:改上面那几类受保护的文件;改任务计划 / 资料汇编 / 提纲里的确认记录(approval),
      或者把任务计划的进度(pipeline_status)改到助手不该推进的状态。
 - PostToolUse(request_user_input):原生卡交回的原文(用户真实的回答)记进会话记录,拿不到就记「缺」。
-- Stop:扫这一轮最后一条回复 —— 内部文件的链接或路径、说明书这类说自己说明的词、词表里的内部词;有问题就打回重说一次。
+- Stop:扫这一轮最后一条回复 —— 内部文件的链接或路径、说明书这类说自己说明的词、讲卡片和检查怎么运作的话(第九轮)、
+  词表里的内部词;有报告类型卡或决定卡在等用户定时,把它叫成「确认卡」也算;有问题就打回重说一次。
   打回时请它保留原来告诉用户的下一步(回哪个数字);回复里说下一步的那句本身没毛病,就原样交还给它(第七轮)。
   stop_hook_active 为 true(打回过一次了)时放行,并记一笔。只看得到最后一条回复,工具调用之间的过程消息看不到。
 """
@@ -72,6 +74,11 @@ APPROVE_REASON = ("确认记录只由 card.py answer 写（用户在卡上点了
                   "（也不带 --signature、--expect-hash、--replace-signed）。要用户确认，按选项卡的做法出卡。")
 ADVANCE_REASON = ("进度只许你推进到 gate1_awaiting / gate2_awaiting / gate3_awaiting / verifying（这次是 %s）："
                   "确认之后的推进由 card.py answer 做。")
+# 第九轮:决定卡只收到「你看着办」(只写了意见),助手就自己写资料汇编、推进了进度。还有一件事在等用户定时,不推进
+ADVANCE_WAITING_REASON = ("还有一件事在等用户定（%s，卡 %s：%s）：先把这件事问清 —— 卡还能再回答的，说 card.py answer 输出的 "
+                          "say 里那句（里面写着回哪个数字；卡还没发出去，就照 card.py prepare 的输出发卡），然后停下等他回，他回了数字或"
+                          "选项名，照 note-user 的提示跑 card.py answer；卡已经关了的（回答没认出来，或者已经再答过一次），重新跑 "
+                          "card.py prepare 出这张卡。在那之前不推进进度，也不按猜的选择（哪怕是你推荐的那一项）去写材料、出下一张卡。")
 RECORD_REASON = ("卡片记录、用户消息记录、交付记录和守门脚本的记录只由脚本写，不能用命令改、删、覆盖"
                  "（只读的话用 Get-Content -Raw -Encoding utf8）。用户消息照 AGENTS.md 先写进 records/_inbox.txt 再跑 card.py note-user。")
 TOOL_REASON = ("「%s」是工具或说明文件（toolkit/、agent-tools/、.agents/、.codex/、wording/、AGENTS.md 这些），对你只读："
@@ -359,10 +366,40 @@ def rule_stamp(cmd, ti, d):
         return None
     if APPROVE_RE.search(cmd):
         return APPROVE_REASON
-    for m in ADVANCE_RE.finditer(cmd):
+    advances = list(ADVANCE_RE.finditer(cmd))
+    for m in advances:
         if m.group(1) not in AGENT_STATES:
             return ADVANCE_REASON % m.group(1)
+    if advances:
+        # 第九轮:这个项目里还有报告类型卡 / 决定卡在等用户定(没答、只写了意见、收起来了还能再答)→ 不推进
+        for name in plan_projects(cmd, d):
+            card, why = sessions.project_waiting_card(os.path.join(sessions.projects_root(), name))
+            if card:
+                return ADVANCE_WAITING_REASON % (card.get("title") or card.get("kind"), card.get("card_id"),
+                                                 sessions.WAITING_SAID[why])
     return None
+
+
+PLAN_PATH_RE = re.compile(r"\"([^\"\n]*task_plan\.md)\"|'([^'\n]*task_plan\.md)'|([^\s\"'|;&<>]*task_plan\.md)", re.I)
+
+
+def plan_projects(cmd, d):
+    """命令里写的任务计划(projects/<项目名>/task_plan.md,相对会话的工作目录或绝对路径)→ [项目名](原样大小写,不重复)。
+    认两个根:项目文件夹的根(sessions.projects_root,测试里换成临时文件夹)和工作区里的 projects/(命令照说明写的样子)。"""
+    base = d.get("cwd") if isinstance(d.get("cwd"), str) and d.get("cwd") else ROOT
+    roots = [os.path.abspath(sessions.projects_root()), os.path.abspath(os.path.join(ROOT, "projects"))]
+    out = []
+    for m in PLAN_PATH_RE.finditer(cmd):
+        token = next(g for g in m.groups() if g)
+        full = os.path.abspath(os.path.join(base, token))
+        for root in roots:
+            if not os.path.normcase(full).startswith(os.path.normcase(root) + os.sep):
+                continue
+            parts = os.path.relpath(full, root).replace("\\", "/").split("/")
+            if len(parts) == 2 and parts[1].lower() == "task_plan.md" and parts[0] not in out:
+                out.append(parts[0])
+            break
+    return out
 
 
 def rule_records(cmd, ti, d):
@@ -714,7 +751,43 @@ def self_ref_rules():
                       except_words=("招股说明书", "募集说明书", "药品说明书", "产品说明书", "使用说明书"), order=10005),
         # 我们自己工具的名字(对用户只说「卡」「进度」,不说「选项卡」「进度表」)后面接流程、说明这类词:说的是自己的说明
         wc.extra_rule("self:说明", r"(?:选项卡|进度表)(?:流程|说明|指引|规矩|规则|技能)", _SELF_SAY, order=10006),
+    ] + tool_talk_rules()
+
+
+# 第九轮:讲工具怎么运作。10-04 第二次全程试跑,决定卡只收到意见之后,最后一条回复说「确认卡没有将“你看着办”识别为选定方案，
+# 自动检查因此拦住了下一步；目前需要这个数字才能记录选择」。研究文字里的「检查」「拦截」「识别出」「记录了」照常用(负控在测试里)。
+_TOOL_SAY = "不讲卡片和检查是怎么运作的：用研究上的话说现在要用户定什么、回哪个数字（例如「要按这个办，回 1 就行」）"
+
+
+def tool_talk_rules():
+    import wording_check as wc
+    return [
+        # 「识别为选定方案」「认成你的选择」(「识别出 3 类风险」「识别为高风险地区」「我认为选择……更稳妥」「选择性偏差」照常用)
+        wc.extra_rule("self:工具", r"(?:识别(?:为|成)|认成|认作)(?:选定|选中|已选|你的选择|选择(?!性)|确认|回答|有效回答|选项)",
+                      _TOOL_SAY, order=10101),
+        wc.extra_rule("self:工具", r"(?:没有|没|未|无法|不能)(?:能)?(?:被)?(?:识别|认出)(?:出)?(?:你的|这个|这次|该)?"
+                                   r"(?:选择(?!性)|回答|选项|选定)", _TOOL_SAY, order=10102),
+        # 「自动检查因此拦住了下一步」(「自动检查系统拦截了 3 批货物」「审计作为守门人拦住了……」「系统检查拦下了……」照常用)
+        wc.extra_rule("self:工具", r"自动检查[^。！？!?\n]{0,12}?拦(?:住|下)", _TOOL_SAY, order=10103),
+        wc.extra_rule("self:工具", r"拦(?:住|下)了?(?:这一步|下一步|推进|进度)", _TOOL_SAY, order=10104),
+        # 「才能记录选择」「写入确认记录」(卡上的固定文字「由助手写下确认记录」照常用;「记录了 2024 年的数据」照常用)
+        wc.extra_rule("self:工具", r"记录(?:你的|这个|这次|该)?(?:选择|选项)(?!性)", _TOOL_SAY, order=10105),
+        wc.extra_rule("self:工具", r"写(?:入|进)了?(?:确认|交付)?记录", _TOOL_SAY, order=10106),
+        wc.extra_rule("self:工具", r"项目工具|工具记录|脚本(?:记录|识别|拦|检查|报错|退回|没有|没|不)", _TOOL_SAY, order=10107),
+        # 「确认卡没有将……识别为……」:说卡片自己怎么判
+        wc.extra_rule("self:工具", r"(?:确认卡|选项卡|决定卡|卡片)(?:没有|没|未|无法|不能|不会)(?:将|把)?[^。！？!?\n]{0,20}?"
+                                   r"(?:识别|认出|认成|记成|算成|当成|记录)", _TOOL_SAY, order=10108),
     ]
+
+
+# 第九轮:刚才那张卡是报告类型卡或决定卡(要用户在几个做法里选一个),回复却把它叫成「确认卡」
+CHOICE_CARD_SAY = "刚才那张卡是请你在几个做法里选一个，不是确认卡：说「刚才那张卡」或「这件事」，照 say 说回哪个数字"
+
+
+def choice_card_rule():
+    import wording_check as wc
+    return wc.extra_rule("self:卡名", r"(?:这张|那张|刚才的?|上面的?|上一张|你的)确认卡|确认卡(?:没有|没|未|无法|不能|不会|将|把)",
+                         CHOICE_CARD_SAY, order=10201)
 
 
 _MD_LINK_RE = re.compile(r"\[([^\]\n]*)\]\(\s*(<[^>\n]*>|[^)\n]*?)\s*\)")
@@ -756,8 +829,9 @@ def classify(target):
     return "other"
 
 
-def scan_reply(text, user_texts=()):
-    """助手的一条回复 → 问题列表(给助手看的话);空 = 没问题。"""
+def scan_reply(text, user_texts=(), card_kind=None):
+    """助手的一条回复 → 问题列表(给助手看的话);空 = 没问题。card_kind:正在等用户定的那张卡是哪一种(报告类型卡、决定卡时
+    不许把它叫成「确认卡」,第九轮;没有卡在等就是 None)。"""
     import wording_check as wc
     chars = list(text)
     problems = []
@@ -786,7 +860,8 @@ def scan_reply(text, user_texts=()):
             judge(m.group(1) if rx is _AUTOLINK_RE else m.group(0), m.group(0))
             blank(m.start(), m.end())
     masked = "".join(chars)
-    for h in wc.scan(masked, list(user_texts), "", extra=self_ref_rules()):
+    rules = self_ref_rules() + ([choice_card_rule()] if card_kind in sessions.CHOICE_KINDS else [])
+    for h in wc.scan(masked, list(user_texts), "", extra=rules):
         problems.append("「%s」→ %s" % (h["text"], h["suggestion"]))
     seen, out = set(), []
     for p in problems:
@@ -814,15 +889,27 @@ def stop_user_texts(session_id):
     return texts
 
 
-def next_step_lines(text, user_texts=()):
+def next_step_lines(text, user_texts=(), card_kind=None):
     """回复里告诉用户下一步怎么做的句子 → 原样列出来(最多两句),打回重说时请助手照留;
     本身就带内部东西的句子不列(要重说的正是它)。"""
     out = []
     for part in re.split("(?<=[。！？!?])|\n", text):
         s = part.strip()
-        if s and NEXT_STEP_RE.search(s) and s not in out and not scan_reply(s, user_texts):
+        if s and NEXT_STEP_RE.search(s) and s not in out and not scan_reply(s, user_texts, card_kind):
             out.append(s)
     return out[:2]
+
+
+def waiting_choice_kind():
+    """有没有一张报告类型卡 / 决定卡正在等用户定(某个项目最近出的那张卡,没答、只写了意见、收起来了)→ 它的 kind;没有 → None。
+    只在这时才不许把卡叫成「确认卡」:那张卡已经定下来了,助手说的「这张确认卡」多半是在说别的卡(例如连着被退回的任务计划卡)。"""
+    for proj, path in card_logs():
+        if proj is None:
+            continue
+        card_ev, _why = sessions.waiting_choice_card(sessions.read_jsonl(path))
+        if card_ev:
+            return card_ev.get("kind")
+    return None
 
 
 def on_stop(d):
@@ -830,13 +917,14 @@ def on_stop(d):
     if not isinstance(msg, str) or not msg.strip():
         return None
     users = stop_user_texts(d.get("session_id"))
-    problems = scan_reply(msg, users)
+    kind = waiting_choice_kind()
+    problems = scan_reply(msg, users, kind)
     if not problems:
         return None
     if d.get("stop_hook_active"):
         note(d, {"event": "stop_passed", "problems": problems, "why": "已经打回过一次（stop_hook_active），这次放行"})
         return None
-    keep = next_step_lines(msg, users)
+    keep = next_step_lines(msg, users, kind)
     tail = ("，下面这句照原样留着：%s" % "".join("「%s」" % s for s in keep)) if keep else ""
     note(d, {"event": "stop_blocked", "problems": problems, "keep": keep})
     return {"decision": "block", "reason": STOP_REASON % ("；".join(problems[:6]), tail)}

@@ -58,6 +58,8 @@ SOURCE_RESULTS = ("相符", "不符", "无法验证")
 MIN_SOURCE_CHECKS = 5
 RULE_FILES = ("redlines.md", "aggregation.md", "discipline.md")
 SKILL = ".agents/skills/review-module/SKILL.md"
+# 起了复核助手之后对用户说的一句(只说这一句,然后等它交卷)
+WAITING_SAY = "一个没参与写作的助手正在独立复核成稿，做完我告诉你结果。"
 
 
 def review_dir(project):
@@ -239,9 +241,12 @@ def start(project, n):
             "paragraphs": len(paras), "source_checks_min": need,
             "code_notice": "%s：%s（只写在你自己的这段输出里：不许写进给复核助手的消息、不许写进任何文件）" % (CODE_LABEL, code),
             "spawn": {"message": message, "fork_turns": "none"},
+            # 第九轮:等复核助手的时候,助手连发了约 7 条「还在等」—— 说一句就够,然后等
+            "say": WAITING_SAY,
             "next": ("Codex：调 spawn_agent 另起复核助手，参数就是 spawn 那两项：message 写 spawn.message 那一句（原样），"
                      "fork_turns 明写 \"none\" —— 这一项不写，Codex 默认是 \"all\"，会把整段写作对话分给复核助手，这一轮就不算独立；"
                      "也不写轮数。然后 wait_agent 等它做完；起了之后不再给它发消息（不用 send_message、followup_task，也不打断它）。"
+                     "等的时候在对话里说一句就够（say 里那句），然后就等它交卷，不要每隔一会儿再发一条「还在等」。"
                      "不要自己打开那份说明（里面的随机码只给复核助手）。"
                      "WorkBuddy：调用 review-module 这份 skill，把 spawn.message 那一句交给它。"
                      "复核助手做完会自己跑 review.py seal；你再跑 review.py check。")}

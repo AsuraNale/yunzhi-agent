@@ -20,6 +20,9 @@
   助手用网页工具打开过的,用 mark 记成 ok(via: web-tool,带日期)。之前 mark 过的条目,不能联网时探测不会盖掉它。
 探测完要重新生成两种成稿(生成脚本会给 4xx / 5xx 的条目加 ⚠),而且都放在独立复核之前。
 第四轮:资料卡片上记过打不开 / 出错(从没读到)的来源,探测发现现在打得开了 → 输出 retry,next 叫助手写进成稿之前先回去真的读一遍。
+第九轮:其中是资料缺口卡上的来源(缺口当初就是因为它没读到才立的)→ 另列 gap_sources_reachable,next 叫助手先重读、再定缺口;
+mark 的读过证据再加一条:这个网址的原件存下来了(fetched/converted 有转成的文字)时,卡上的摘录要能在那份文字里找到
+(全角半角归一、去掉空白后比),找不到不算读过。
 probed_from 取 --from,其次环境变量 YUNZHI_PROBED_FROM,都没有就写 unknown(不猜)。
 """
 import argparse
@@ -130,12 +133,33 @@ def run(project, where, timeout):
                        "没打开过的不许记。然后重新生成两种成稿，再跑交付前检查。把 say 那句告诉用户。")
     else:
         out["next"] = "探测完了。接着重新生成网页版和 Word 版（生成脚本会给打不开的条目加 ⚠），再跑交付前检查。"
-    if retry:
+    # 第九轮:资料缺口卡上当初没读到的来源,现在打得开了 —— 缺口可能补得上:先重读,再定缺口(10-04 第二次全程试跑:
+    # 两条主缺口的来源重新打得开,助手没再读)。这几条单独说;别的没读到的来源照第四轮的 retry 说。
+    gap_src = gap_card_sources(project)
+    gap_open = []
+    for e, (state, _d, _s) in results:
+        if state == "ok" and isinstance(e.get("url"), str):
+            for uid, title, was in gap_src.get(_norm(e["url"]), []):
+                gap_open.append({"id": e.get("id"), "url": e["url"], "card": uid, "card_title": title, "was": was})
+    if gap_open:
+        out["gap_sources_reachable"] = gap_open
+    gap_ids = {g["id"] for g in gap_open}
+    rest = [r for r in retry if r["id"] not in gap_ids]
+    if rest:
         out["next"] = ("这几个来源当初没读到（资料卡片上记的是打不开或出错），现在链接打得开了：%s。写进成稿之前，先用网页工具"
                        "真的打开、读一遍：读到了，就跑 fetches.py add \"<项目名>\" --url \"<网址>\" --state ok 记下重新取到了，"
                        "把资料卡片上这个来源改成 fetch_state: ok、写原文摘录、as_of 写今天，再跑 refs_add.py 更新参考文献清单"
                        "（卡上的数和结论有变化的，资料汇编要重新确认）；还是读不到，就照旧，不要引用它。然后再接着下面这一步：%s"
-                       % ("、".join("%s %s" % (r["id"], r["url"]) for r in retry), out["next"]))
+                       % ("、".join("%s %s" % (r["id"], r["url"]) for r in rest), out["next"]))
+    if gap_open:
+        out["next"] = ("资料缺口卡上的来源现在打得开了：%s。这几个缺口当初就是因为这些来源没读到才立的，现在可能补得上 —— "
+                       "先用网页工具把它们真的重读一遍，再定缺口：读到了要的数据，就跑 $PY \"agent-tools/fetches.py\" add \"%s\" "
+                       "--url \"<网址>\" --state ok 记下重新取到了，照资料卡片的做法另做一张卡（旧卡不改），资料汇编里这个缺口照实改掉，"
+                       "改了资料汇编就要请用户重新确认；还是没有要的数据，缺口照旧（照实再记一次 fetches.py add … --state empty 或 blocked）。"
+                       "然后再接着下面这一步：%s"
+                       % ("、".join("%s %s（资料缺口卡「%s」上记的是%s）" % (g["id"], g["url"], g["card_title"],
+                                                                     "打不开" if g["was"] == "blocked" else "出错")
+                                   for g in gap_open), yzlib.project_name(project), out["next"]))
     # 第八轮:成稿里引用了、探测却没打开的(打不开、连不上、不能联网没检查)—— 交付前检查会拦,这里先说
     unreached = cited_unreached(project, entries)
     if unreached:
@@ -148,7 +172,7 @@ def run(project, where, timeout):
                         "记下读过（不用重新生成成稿）" % ("、".join(done), yzlib.project_name(project),
                                                  " ".join("--id %s" % i for i in done)))
         if never:
-            said.append("%s 成稿里引用了、探测没打开，资料卡片上也没有读过它的证据（取到了、写了原文摘录）：不能记成读过 —— "
+            said.append("%s 成稿里引用了、探测没打开，资料卡片上也没有读过它的证据（取到了、写了原文摘录；存了原件的，摘录要在原文里找得到）：不能记成读过 —— "
                         "用网页工具真的读一遍（读到了照资料卡片的做法补上原文摘录；以前记过没取到的先 fetches.py add … --state ok），"
                         "读不到就改掉成稿里的这处引用" % "、".join(never))
         out["next"] = "；".join(said) + "。然后：" + out["next"]
@@ -160,26 +184,69 @@ def _norm(url):
     return norm_url_key(url) if isinstance(url, str) and url.strip() else None
 
 
-def read_urls(project):
-    """读过的来源的网址(归一后):资料卡片(没弃用的)上这个来源取到了(fetch_state: ok)、写了原文摘录(excerpt)。
-    第八轮:这就是「读过」的证据 —— mark 只收有它的。"""
+def _flat(text):
+    """比摘录用的样子:全角半角归一(NFKC)之后去掉全部空白。PDF、网页转出来的文字常在句子中间断行,空白不算。"""
+    import re
+    import unicodedata
+    return re.sub(r"\s+", "", unicodedata.normalize("NFKC", text or ""))
+
+
+def saved_texts(project):
+    """取来存下的资料转成的文字 → {归一后的网址: [比摘录用的文字…]}:records/fetched.jsonl 里转成了文字的那几份
+    (fetched/converted/;读不出的跳过)。"""
+    out = {}
+    for r in yzlib.read_jsonl(os.path.join(project, "records", "fetched.jsonl")):
+        key = _norm(r.get("url"))
+        if not key or r.get("state") != "ok":
+            continue
+        for rel in r.get("outputs") or []:
+            path = os.path.join(project, *str(rel).split("/"))
+            try:
+                with io.open(path, encoding="utf-8-sig", errors="replace") as f:
+                    out.setdefault(key, []).append(_flat(f.read()))
+            except OSError:
+                continue
+    return out
+
+
+def read_evidence(project):
+    """每个来源网址(归一后)读过的证据 → {网址: (算不算读过, 哪张卡, 怎么判的)}。
+    读过的证据(第八轮)= 资料卡片(没弃用的)上这个网址的来源取到了(fetch_state: ok)、写了原文摘录(excerpt)。
+    第九轮:这个网址的原件存下来了、转成了文字(fetched/converted)时,摘录还要能在那份文字里找到(全角半角归一、去掉空白后比);
+    找不到就不算读过(10-04 第二次全程试跑:有一张卡的摘录后来被复核判为不是原文)。没存原件的,照旧只看有没有摘录。
+    几张卡都引了同一个网址:有一张算读过就算。"""
     d = os.path.join(project, "cards")
     if not os.path.isdir(d):
-        return set()
+        return {}
     from card_check import load_cards
     try:
         cards = load_cards(d)
     except Exception:  # noqa: BLE001  卡片读不出来:card_check 会报;这里当没有证据
-        return set()
-    out = set()
-    for c, _fn in cards:
+        return {}
+    texts = saved_texts(project)
+    out = {}
+    for c, fn in cards:
         if not isinstance(c, dict) or c.get("deprecated"):
             continue
+        uid = str(c.get("uid") or fn)
         for s in c.get("sources") or []:
-            if (isinstance(s, dict) and s.get("fetch_state") == "ok" and isinstance(s.get("excerpt"), str)
+            if not (isinstance(s, dict) and s.get("fetch_state") == "ok" and isinstance(s.get("excerpt"), str)
                     and s["excerpt"].strip() and _norm(s.get("url"))):
-                out.add(_norm(s.get("url")))
+                continue
+            key = _norm(s.get("url"))
+            if key in texts:
+                ok = _flat(s["excerpt"]) in "\n".join(texts[key])
+                got = (ok, uid, "摘录在存下的原文里找得到" if ok else "摘录在存下的原文里找不到")
+            else:
+                got = (True, uid, "有原文摘录（这个网址没存原件，只核有没有摘录）")
+            if key not in out or (got[0] and not out[key][0]):
+                out[key] = got
     return out
+
+
+def read_urls(project):
+    """读过的来源的网址(归一后):有读过的证据的那几个(read_evidence)。mark 只收这些。"""
+    return {k for k, got in read_evidence(project).items() if got[0]}
 
 
 def cited_unreached(project, entries):
@@ -201,6 +268,28 @@ def cited_unreached(project, entries):
         lv = e.get("liveness") if isinstance(e.get("liveness"), dict) else {}
         if lv.get("state") == "blocked" or (lv.get("state") == "failed" and lv.get("detail") == "net"):
             out.append((e.get("id"), e.get("url"), _norm(e.get("url")) in seen))
+    return out
+
+
+def gap_card_sources(project):
+    """资料缺口卡(没弃用的)上当初没读到的来源(fetch_state 是打不开 blocked 或出错 failed)→
+    {归一后的网址: [(卡号, 卡的标题, 当初的情况)]}。打开了、里面没有要的数据(empty)的不算:那时就打得开,现在打得开不是新情况。"""
+    d = os.path.join(project, "cards")
+    if not os.path.isdir(d):
+        return {}
+    from card_check import load_cards
+    try:
+        cards = load_cards(d)
+    except Exception:  # noqa: BLE001  卡片读不出来:card_check 会报,这里不挡探测
+        return {}
+    out = {}
+    for c, fn in cards:
+        if not isinstance(c, dict) or c.get("deprecated") or c.get("stance") != "gap":
+            continue
+        for s in c.get("sources") or []:
+            if isinstance(s, dict) and s.get("fetch_state") in ("blocked", "failed") and _norm(s.get("url")):
+                out.setdefault(_norm(s.get("url")), []).append(
+                    (str(c.get("uid") or fn), str(c.get("title") or c.get("uid") or fn).strip(), s.get("fetch_state")))
     return out
 
 
@@ -229,23 +318,34 @@ def mark(project, ids):
     want = {i.strip() for i in ids if i and i.strip()}
     if not want:
         raise UsageError("要写 --id（参考文献清单里的编号，如 R003）")
-    found, unread = set(), []
-    seen = read_urls(project)
+    found, unread, mismatch = set(), [], []
+    evidence = read_evidence(project)
     for e in entries:
         if isinstance(e, dict) and str(e.get("id")) in want:
             if not (isinstance(e.get("url"), str) and e["url"].startswith(("http://", "https://"))):
                 raise UsageError("%s 没有网址，不用记" % e.get("id"))
             found.add(str(e.get("id")))
-            if _norm(e.get("url")) not in seen:
+            got = evidence.get(_norm(e.get("url")))
+            if got is None:
                 unread.append(str(e.get("id")))
+            elif not got[0]:
+                mismatch.append("%s（资料卡片 %s）" % (e.get("id"), got[1]))
     missing = sorted(want - found)
     if missing:
         raise UsageError("参考文献清单里没有这几个编号：%s" % "、".join(missing))
+    said = []
     if unread:
         # 第八轮:没读过的不能记成读过 —— 读过的证据是资料卡片上这个来源取到了、写了原文摘录
-        raise UsageError("%s 在资料卡片上没有读过的证据（这个网址的来源取到了 fetch_state: ok、写了原文摘录 excerpt）：没读过的不能记成读过。"
-                         "用网页工具真的读一遍：读到了，照资料卡片的做法补上原文摘录（以前记过没取到的，先跑 fetches.py add … --state ok），"
-                         "再来记；读不到，就改掉成稿里引用它的地方。" % "、".join(sorted(unread)))
+        said.append("%s 在资料卡片上没有读过的证据（这个网址的来源取到了 fetch_state: ok、写了原文摘录 excerpt）：没读过的不能记成读过。"
+                    "用网页工具真的读一遍：读到了，照资料卡片的做法补上原文摘录（以前记过没取到的，先跑 fetches.py add … --state ok），"
+                    "再来记；读不到，就改掉成稿里引用它的地方。" % "、".join(sorted(unread)))
+    if mismatch:
+        # 第九轮:原件存下来了,摘录却在它转成的文字里找不到 —— 也不算读过
+        said.append("%s 的原文摘录在存下来的原文（fetched/converted 里转成的文字）里找不到：摘录要从原文一字不差地抄"
+                    "（空白、全角半角不算）。照原文改好资料卡片上的摘录再来记；原文里没有这句，就是没读到这句 —— 改掉成稿里引用它的地方。"
+                    % "、".join(sorted(mismatch)))
+    if said:
+        raise UsageError("".join(said))
     for e in entries:
         if isinstance(e, dict) and str(e.get("id")) in found:
             e["liveness"] = {"state": "ok", "probed_at": yzlib.now_iso(), "probed_from": "助手用网页工具打开", "via": WEB_TOOL}
