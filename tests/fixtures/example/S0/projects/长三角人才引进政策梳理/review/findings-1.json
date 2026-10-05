@@ -1,0 +1,29 @@
+[
+ {
+  "severity": "checked_ok",
+  "round": 1,
+  "status": null,
+  "location": "第二节第一段",
+  "original": "首次在甲市就业的应届本科生一次性补贴 3 万元",
+  "supported": "与资料卡片 S01 一致",
+  "fix": null
+ },
+ {
+  "severity": "checked_ok",
+  "round": 1,
+  "status": null,
+  "location": "第二节第二段",
+  "original": "当年丙市人才落户 3.6 万人",
+  "supported": "与资料卡片 S03 一致，口径为丙市统计公报",
+  "fix": null
+ },
+ {
+  "severity": "checked_ok",
+  "round": 1,
+  "status": null,
+  "location": "第二节第三段",
+  "original": "租金为市场价的 70%",
+  "supported": "与资料卡片 S04 一致",
+  "fix": null
+ }
+]

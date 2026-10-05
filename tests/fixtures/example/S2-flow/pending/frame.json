@@ -1,0 +1,32 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-012",
+ "question_id": "q-fixture-012",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:flow-change",
+   "question": "Confirm the change of steps?",
+   "options": [
+    {
+     "label": "confirm"
+    },
+    {
+     "label": "not_yet"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "flow-change",
+    "call_id": "call-fixture-012",
+    "kind": "flow_change",
+    "approve": "confirm"
+   },
+   "card": {
+    "kind": "flow_change",
+    "changes": "去掉「拟定提纲」这一步，写作按资料汇编的结构走。"
+   }
+  }
+ ]
+}

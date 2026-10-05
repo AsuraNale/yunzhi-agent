@@ -1,0 +1,28 @@
+{
+ "kind": "review_result",
+ "format": 1,
+ "round": 1,
+ "reviewed_at": "2026-10-05T14:05:00-04:00",
+ "report": "review/report-1.md",
+ "files": {
+  "out/新能源汽车下乡与县域充电设施.html": "68b1789876d7a299e83b9c19d3f1bf66a41176c6beec8259d985b2268584834a",
+  "out/新能源汽车下乡与县域充电设施.docx": "fc1ffb9e41aad4edd48bb3b1606606e27b1bbead43fc6234cda869a83284f4e6"
+ },
+ "counts": {
+  "must_fix": 0,
+  "tone_down": 1,
+  "citation_or_format": 0,
+  "checked_ok": 0
+ },
+ "findings": [
+  {
+   "severity": "tone_down",
+   "round": 1,
+   "status": "open",
+   "location": "第三节第二段",
+   "original": "带动全省县域充电设施翻番",
+   "supported": "参加县增速更高",
+   "fix": "改成参加活动的县增速更高，并写明只来自 3 个地市的数据"
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {"hooks": [{"type": "command", "command": "py -X utf8 agent-tools/hook.py"}]}
+    ],
+    "PreToolUse": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "py -X utf8 agent-tools/hook.py"}]}
+    ],
+    "PostToolUse": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "py -X utf8 agent-tools/hook.py"}]}
+    ],
+    "Stop": [
+      {"hooks": [{"type": "command", "command": "py -X utf8 agent-tools/hook.py"}]}
+    ]
+  }
+}

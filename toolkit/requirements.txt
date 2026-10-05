@@ -1,0 +1,16 @@
+# 云织-Ann 工具包的 Python 依赖
+#
+# 安装：python -X utf8 -m pip install -r requirements.txt
+# Python 3.10 或更高（在 3.12.10 上验证过）。
+
+# YAML 解析：来源登记表、证据卡 frontmatter、正本 frontmatter 都用它。
+# 被 pipeline_lib.py 引入，几乎所有检查脚本经它传染，缺它整条管线跑不起来。
+PyYAML>=6.0
+
+# DOCX 渲染：成品的 Word 格式由它生成，交付对接窗口的表格检查也用它读回。
+# 只有 render_docx.py 与其测试用到；不产出 Word 时可以不装。
+python-docx>=1.1.0
+
+# PDF 读取：把 PDF 资料转成 Markdown 送进采集环节。
+# 只有 convert_pdf.py 用到；不读 PDF 时可以不装。
+pypdf>=4.0.0

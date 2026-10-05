@@ -1,0 +1,31 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-010",
+ "question_id": "q-fixture-010",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:outline",
+   "question": "Confirm the outline?",
+   "options": [
+    {
+     "label": "confirm"
+    },
+    {
+     "label": "not_yet"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "outline",
+    "call_id": "call-fixture-010",
+    "kind": "outline",
+    "approve": "confirm"
+   },
+   "card": {
+    "kind": "outline"
+   }
+  }
+ ]
+}

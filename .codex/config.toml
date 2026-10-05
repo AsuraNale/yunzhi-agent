@@ -1,0 +1,71 @@
+# 云织 Agent 的项目级 Codex 配置：只对这个文件夹里的会话生效，不改全局 ~/.codex/config.toml。
+# Codex 只在这个文件夹被「信任」之后才读这里（第一次在 Codex 里打开时会问）。
+
+[features]
+# 让 agent 在普通模式下也能用 Codex 原生的选项框（request_user_input），用来弹确认卡、决定卡。实验功能。
+default_mode_request_user_input = true
+# 不读 ~/.codex/memories：那里是用户别的项目的笔记，读了就是读了项目以外的文件，卡上自报的清单也就不实
+# （10-03 端到端实测：agent 读了 MEMORY.md，卡上却报 0 个）。
+memories = false
+
+[windows]
+# Windows 默认沙盒换一个单独的身份（CodexSandboxOffline）跑命令，这个身份看不见用户装的 Python
+# （py -0p 报「No installed Pythons found」，python.exe 拒绝访问），而云织的脚本全靠 Python。
+# unelevated 沙盒用当前用户的身份跑：Python 能用，工作区以外照样写不进去（10-03 实测）。
+sandbox = "unelevated"
+
+[sandbox_workspace_write]
+# 收集资料要打开网页本身来读（只在搜索结果里看到的摘要不算取到）。工作区沙盒默认不让联网，这里打开。
+# ⚠ 桌面版可能不认这一条（10-03 实测：turn_context 里 network_access 仍是 false，Windows 沙盒那一条倒是生效了）。
+# 打开网页靠 Codex 自己的网页工具，不受它影响；受影响的是脚本里的联网（链接探测 liveness.py）：
+# 不能联网时它把链接记成「未能自动检查」，助手用网页工具打开过的页面用 liveness.py mark 记下。留着这一条，CLI 认它。
+network_access = true
+
+# ---- 这个工作区用不到的内置插件，在这里关掉 ----
+# 云织的成稿只用 toolkit 的脚本生成、检查（render_html.py / render_docx.py / cite_check.py）。别的插件会接管这一步：
+# 10-03 端到端实测，文档插件跑了它自己的 render_docx.py、建了空的 qa_docx/，还停下来让用户装 pdf2image。
+# 只留两个：codex-app-tools@openai-bundled（open_in_codex：把进度页、材料挂到右侧）和 visualize@openai-bundled（对话里的进度快照）。
+
+# 文档插件：Word 版成稿只由 toolkit 的 render_docx.py 生成
+[plugins."documents@openai-primary-runtime"]
+enabled = false
+
+# PDF 插件：用户的 PDF 材料由 toolkit 的 convert_pdf.py 转成文字；成稿不出 PDF
+[plugins."pdf@openai-primary-runtime"]
+enabled = false
+
+# 表格插件：用户的 Excel 材料由 toolkit 的 convert_xlsx.py 转成文字
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = false
+
+# 演示文稿插件：云织不出幻灯片
+[plugins."presentations@openai-primary-runtime"]
+enabled = false
+
+# 模板插件：卡片和成稿的格式都由云织自己的脚本定
+[plugins."template-creator@openai-primary-runtime"]
+enabled = false
+
+# 操作电脑的插件：研究流程不需要操作用户的电脑
+[plugins."computer-use@openai-bundled"]
+enabled = false
+
+# 同上（另一个版本的操作电脑插件）
+[plugins."unified-computer-use@openai-bundled"]
+enabled = false
+
+# 操作 Chrome 的插件：打开网页原文用联网（上面的 network_access），不操作用户的浏览器和登录状态
+[plugins."chrome@openai-bundled"]
+enabled = false
+
+# 内置浏览器插件：同上
+[plugins."browser@openai-bundled"]
+enabled = false
+
+# 日历：研究流程用不到，也不该碰用户的日程
+[plugins."google-calendar@openai-curated"]
+enabled = false
+
+# Slack：研究流程用不到，也不该替用户发消息
+[plugins."slack@openai-curated"]
+enabled = false

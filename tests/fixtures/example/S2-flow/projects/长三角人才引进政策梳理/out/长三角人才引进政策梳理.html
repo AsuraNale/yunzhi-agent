@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>长三角人才引进政策梳理</title>
+<style>
+/* base.css */
+/* base.css —— 骨架层。所有主题共用,只管结构与可访问性,不管观感。
+   主题只需覆盖下面 :root 里的 token(或按需覆盖布局)。
+   ⚠️ 改这里 = 改所有成品的结构行为,慎。 */
+
+:root{
+  /* 主题必须覆盖的 token(这里给的是无主题时的安全默认值) */
+  --doc-ground:#ffffff; --doc-surface:#ffffff; --doc-sunk:#f2f2f2;
+  --doc-ink:#1a1a1a; --doc-ink-2:#4a4a4a; --doc-ink-3:#767676;
+  --doc-line:#dcdcdc; --doc-line-2:#ececec;
+  --doc-accent:#33607a; --doc-accent-soft:#e6eef3; --doc-accent-deep:#24485c;
+  --doc-pos:#1a7a4a; --doc-pos-soft:#e6f2ec;
+  --doc-warn:#8a6114; --doc-warn-soft:#f6efdf;
+  --doc-neg:#a03030; --doc-neg-soft:#f7e9e8;
+  --doc-mono:ui-monospace,Consolas,monospace;
+  --doc-sans:system-ui,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  --doc-measure:41em;   /* 正文行宽 */
+  --doc-width:1080px;   /* 页面最大宽 */
+}
+
+*{box-sizing:border-box}
+body{background:var(--doc-ground);color:var(--doc-ink);font-family:var(--doc-sans);
+  line-height:1.78;margin:0;padding:0;font-size:16px;-webkit-font-smoothing:antialiased}
+.doc{max-width:var(--doc-width);margin:0 auto;padding:0 24px 90px}
+.doc-narrow{max-width:var(--doc-measure)}
+.doc-mono{font-family:var(--doc-mono);font-variant-numeric:tabular-nums}
+
+/* 报头 */
+.doc-masthead{padding:52px 0 22px;border-bottom:2px solid var(--doc-ink)}
+.doc-eyebrow{font-family:var(--doc-mono);font-size:.72rem;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--doc-accent);font-weight:600}
+.doc-masthead h1{font-size:2.15rem;line-height:1.22;margin:12px 0 10px;
+  letter-spacing:-.015em;text-wrap:balance;font-weight:600}
+.doc-sub{color:var(--doc-ink-2);font-size:.96rem;max-width:44em}
+
+/* 元信息条 —— 全部由渲染器机器取值,不接受手写 */
+.doc-meta{display:flex;flex-wrap:wrap;gap:0;margin-top:22px;border:1px solid var(--doc-line);
+  border-radius:3px;background:var(--doc-surface);overflow:hidden}
+.doc-meta>div{padding:10px 16px;border-right:1px solid var(--doc-line);flex:1 1 auto;min-width:110px}
+.doc-meta>div:last-child{border-right:none}
+.doc-meta .k{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--doc-ink-3);font-family:var(--doc-mono)}
+.doc-meta .v{font-family:var(--doc-mono);font-variant-numeric:tabular-nums;
+  font-size:1.02rem;font-weight:600;margin-top:2px}
+
+/* 章节导航 */
+.doc-toc{position:sticky;top:0;z-index:20;background:var(--doc-ground);
+  border-bottom:1px solid var(--doc-line);padding:9px 0;margin-bottom:30px;
+  display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.doc-toc::-webkit-scrollbar{display:none}
+.doc-toc a{display:flex;align-items:baseline;gap:6px;white-space:nowrap;text-decoration:none;
+  color:var(--doc-ink-2);font-size:.84rem;padding:5px 11px;border-radius:3px}
+.doc-toc a:hover{background:var(--doc-sunk);color:var(--doc-ink)}
+.doc-toc .n{font-family:var(--doc-mono);font-size:.74rem;color:var(--doc-accent);font-weight:600}
+
+/* 前提声明(正文第一个引用块) */
+.doc-premise{background:var(--doc-surface);border:1px solid var(--doc-line);
+  border-left:3px solid var(--doc-accent);border-radius:3px;padding:16px 20px;
+  font-size:.93rem;color:var(--doc-ink-2);margin-bottom:30px}
+
+/* 正文 */
+.doc-sec{margin:0 0 46px}
+.doc h2{font-size:1.42rem;margin:44px 0 16px;line-height:1.32;font-weight:600;
+  display:flex;align-items:baseline;gap:12px;text-wrap:balance;
+  padding-bottom:9px;border-bottom:1px solid var(--doc-line)}
+.doc-secnum{font-family:var(--doc-mono);font-size:.9rem;color:var(--doc-accent);
+  font-weight:600;border:1px solid var(--doc-accent);border-radius:2px;padding:1px 7px;flex:none}
+.doc h3{font-size:1.06rem;margin:30px 0 10px;font-weight:600;color:var(--doc-accent-deep)}
+.doc h4{font-size:.98rem;margin:22px 0 8px;font-weight:600;color:var(--doc-ink-2)}
+.doc p{margin:0 0 15px;max-width:var(--doc-measure)}
+.doc ul,.doc ol{margin:0 0 16px;padding-left:1.5em;max-width:var(--doc-measure)}
+.doc li{margin:6px 0}
+.doc code{font-family:var(--doc-mono);font-size:.9em;background:var(--doc-sunk);
+  padding:1px 5px;border-radius:2px}
+
+/* 文内引用 —— 锚点回跳。⚠️ 用 # 锚点是有意的:cite_check 的 html_links() 只收 http(s) 外链,
+   参考列表条目仍直链来源 URL,故外链集合不变(④ 跨格式相等不受影响)。 */
+sup.doc-cite{font-family:var(--doc-mono);font-size:.66em;vertical-align:super;line-height:0}
+sup.doc-cite a{color:var(--doc-accent);text-decoration:none;font-weight:600;padding:0 1px}
+sup.doc-cite a:hover{text-decoration:underline}
+
+/* 表格 —— 允许超出正文宽度,独立横向滚动,页面本身永不横向滚 */
+.doc-table-wrap{overflow-x:auto;margin:0 0 22px;border:1px solid var(--doc-line);
+  border-radius:3px;background:var(--doc-surface)}
+.doc table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:min(100%,560px)}
+.doc th,.doc td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--doc-line-2);
+  vertical-align:top}
+.doc thead th{background:var(--doc-sunk);font-size:.72rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--doc-ink-3);font-family:var(--doc-mono);
+  font-weight:600;white-space:nowrap;border-bottom:1px solid var(--doc-line)}
+.doc tbody tr:last-child td{border-bottom:none}
+.doc td{font-variant-numeric:tabular-nums}
+/* 语义色列(表头写「绿灯/黄灯/红灯」时自动上色) */
+.doc-lt-pos{background:var(--doc-pos-soft)} .doc thead th.doc-lt-pos{color:var(--doc-pos)}
+.doc-lt-warn{background:var(--doc-warn-soft)} .doc thead th.doc-lt-warn{color:var(--doc-warn)}
+.doc-lt-neg{background:var(--doc-neg-soft)} .doc thead th.doc-lt-neg{color:var(--doc-neg)}
+
+/* 行动卡(加粗标题 + 冒号 + ①②③ 序列的段落) */
+.doc-action{background:var(--doc-accent-soft);border:1px solid var(--doc-accent);
+  border-radius:3px;padding:14px 18px;margin:22px 0 30px;max-width:var(--doc-measure)}
+.doc-action-h{font-family:var(--doc-mono);font-size:.72rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--doc-accent-deep);font-weight:600;margin-bottom:7px}
+.doc-action ol{margin:0;padding-left:1.3em}
+.doc-action li{margin:5px 0;font-size:.92rem}
+
+.doc-colophon{font-size:.86rem;color:var(--doc-ink-3);border-top:1px solid var(--doc-line);
+  padding-top:18px;margin-top:34px;max-width:none}
+
+/* 来源登记表 */
+.doc-refs{margin-top:56px;padding-top:26px;border-top:2px solid var(--doc-ink)}
+.doc-refs h2{border:none;margin-top:0}
+.doc-ref-list{list-style:none;padding:0;margin:0;display:grid;gap:2px;max-width:none}
+.doc-ref-list li{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:11px 12px;
+  border-radius:3px;background:var(--doc-surface);border:1px solid var(--doc-line-2);margin:0}
+.doc-ref-list li:target{border-color:var(--doc-accent);background:var(--doc-accent-soft)}
+.doc-ref-no{font-family:var(--doc-mono);font-size:.82rem;color:var(--doc-accent);
+  font-weight:600;text-align:right;padding-top:1px}
+.doc-ref-t{font-size:.92rem;line-height:1.5}
+.doc-ref-t a{color:var(--doc-ink);text-decoration:none;border-bottom:1px solid var(--doc-accent)}
+.doc-ref-t a:hover{color:var(--doc-accent)}
+.doc-ref-m{font-size:.8rem;color:var(--doc-ink-3);margin-top:3px;line-height:1.55}
+.doc-tier{font-family:var(--doc-mono);font-size:.68rem;font-weight:600;padding:1px 6px;
+  border-radius:2px;background:var(--doc-sunk);color:var(--doc-ink-2);white-space:nowrap}
+.doc-tier-A{background:var(--doc-pos-soft);color:var(--doc-pos)}
+.doc-tier-Am{background:var(--doc-accent-soft);color:var(--doc-accent-deep)}
+.doc-tier-B{background:var(--doc-warn-soft);color:var(--doc-warn)}
+.doc-flag{font-family:var(--doc-mono);font-size:.68rem;padding:1px 6px;border-radius:2px;
+  background:var(--doc-sunk);color:var(--doc-ink-3);white-space:nowrap}
+.doc-flag-warn{background:var(--doc-warn-soft);color:var(--doc-warn)}
+.doc-foot{font-size:.85rem;color:var(--doc-ink-3);margin-top:20px;max-width:none}
+
+a:focus-visible,.doc-toc a:focus-visible{outline:2px solid var(--doc-accent);outline-offset:2px}
+
+@media (max-width:720px){
+  .doc{padding:0 16px 60px}
+  .doc-masthead h1{font-size:1.7rem}
+  .doc-meta>div{min-width:50%}
+  .doc h2{font-size:1.24rem}
+}
+@media print{
+  .doc-toc{display:none}
+  body{background:#fff}
+  .doc-action,.doc-table-wrap,.doc-ref-list li{break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* plan.css */
+/* plan —— 默认主题。执行手册气质:冷灰底 + 钢青,像工程图纸/训练台账。
+   适合:计划、方案、执行手册、带仪表和表格的交付物。
+   ⚠️ 只用系统字体栈,不外链字体 —— 成品必须真正自包含(离线可读、可转发)。 */
+
+:root{
+  --doc-ground:#f6f8f9; --doc-surface:#ffffff; --doc-sunk:#eef2f4;
+  --doc-ink:#141b22; --doc-ink-2:#42505e; --doc-ink-3:#6b7a89;
+  --doc-line:#dde5e9; --doc-line-2:#e9eff2;
+  --doc-accent:#0e6a7e; --doc-accent-soft:#e0eef1; --doc-accent-deep:#0a4e5d;
+  --doc-pos:#1a7a4a; --doc-pos-soft:#e4f2ea;
+  --doc-warn:#9a6b18; --doc-warn-soft:#f8efdd;
+  --doc-neg:#a83232; --doc-neg-soft:#f9e8e7;
+  --doc-mono:"Cascadia Code","JetBrains Mono",Consolas,"SF Mono",ui-monospace,monospace;
+  --doc-sans:"Segoe UI Variable Text","Segoe UI",-apple-system,"PingFang SC",
+             "Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --doc-ground:#0e1418; --doc-surface:#151d23; --doc-sunk:#1b252c;
+    --doc-ink:#e5edf1; --doc-ink-2:#a8b8c4; --doc-ink-3:#7d8f9c;
+    --doc-line:#28353d; --doc-line-2:#1f2b32;
+    --doc-accent:#4fc3d9; --doc-accent-soft:#0d3941; --doc-accent-deep:#8fdcec;
+    --doc-pos:#5cc98d; --doc-pos-soft:#10331f;
+    --doc-warn:#e0aa4a; --doc-warn-soft:#3a2c0e;
+    --doc-neg:#f08a86; --doc-neg-soft:#3d1a19;
+  }
+}
+:root[data-theme="dark"]{
+  --doc-ground:#0e1418; --doc-surface:#151d23; --doc-sunk:#1b252c;
+  --doc-ink:#e5edf1; --doc-ink-2:#a8b8c4; --doc-ink-3:#7d8f9c;
+  --doc-line:#28353d; --doc-line-2:#1f2b32;
+  --doc-accent:#4fc3d9; --doc-accent-soft:#0d3941; --doc-accent-deep:#8fdcec;
+  --doc-pos:#5cc98d; --doc-pos-soft:#10331f;
+  --doc-warn:#e0aa4a; --doc-warn-soft:#3a2c0e;
+  --doc-neg:#f08a86; --doc-neg-soft:#3d1a19;
+}
+
+</style></head><body>
+<div class="doc">
+<header class="doc-masthead">
+<h1>长三角人才引进政策梳理</h1>
+
+<div class="doc-meta"><div><div class="k">章节</div><div class="v">3</div></div><div><div class="k">文内引用</div><div class="v">15</div></div><div><div class="k">证据卡</div><div class="v">6</div></div><div><div class="k">参考来源</div><div class="v">8</div></div></div>
+</header>
+<nav class="doc-toc"><a href="#doc-s1"><span class="n">1</span>一、四个市的政策各有侧重</a><a href="#doc-s2"><span class="n">2</span>二、补贴、落户、住房三块怎么比</a><a href="#doc-s3"><span class="n">3</span>三、几点提醒</a></nav>
+
+<main>
+<section class="doc-sec" id="doc-s1">
+<h2><span class="doc-secnum">1</span>一、四个市的政策各有侧重</h2>
+<p>这份材料梳理长三角甲、乙、丙、丁四个市 2024—2025 年的人才引进政策，只比较政策文本，不评价实际效果。四个市都在用补贴、落户、住房这三类手段，但侧重点不一样：甲市靠按学历分档的补贴，乙市把钱集中在少数高层次人才身上，丙市主要靠放宽落户，丁市以人才公寓为主。一份二手的比较研究也有相近的看法<sup class="doc-cite"><a href="#doc-ref-1" title="《长三角人才政策比较研究（2025）》（虚构）">[1]</a></sup>，但它没有列出逐市的依据，这里只当背景。</p>
+<p>需要先说明两点口径。第一，补贴金额是文件上写明的发放标准，四个市都没有公布实际发放的金额和人数，所以这份材料不比较「谁花得多」。第二，乙市认定「人才」的标准和其他三个市不一样，乙市的数字不能直接和其他三市放在一起比。</p>
+</section>
+<section class="doc-sec" id="doc-s2">
+<h2><span class="doc-secnum">2</span>二、补贴、落户、住房三块怎么比</h2>
+<p>先看补贴。甲市 2024 年修订了安居办法，首次在甲市就业的应届本科生一次性补贴 3 万元，硕士 5 万元、博士 10 万元<sup class="doc-cite"><a href="#doc-ref-2" title="《甲市人才安居实施办法（2024 年修订）》（虚构）">[2]</a></sup>。甲市 2025 年的工作要点提出继续执行这一标准<sup class="doc-cite"><a href="#doc-ref-3" title="《甲市 2025 年人才工作要点》（虚构）">[3]</a></sup>。乙市的补贴集中在高层次人才：认定为 A 类的顶尖人才最高奖励 500 万元，分五年发放<sup class="doc-cite"><a href="#doc-ref-4" title="《乙市高层次人才引进若干措施》（虚构）">[4]</a></sup>。两种做法覆盖的人群差别很大：甲市覆盖所有应届毕业生，乙市只覆盖少数经过认定的人。</p>
+<p>再看落户。丙市 2024 年起，45 周岁以下、大专以上学历即可落户<sup class="doc-cite"><a href="#doc-ref-5" title="《丙市人才落户实施细则》（虚构）">[5]</a></sup>，是四个市里门槛最低的。当年丙市人才落户 3.6 万人<sup class="doc-cite"><a href="#doc-ref-6" title="《丙市统计公报 2024》（虚构）">[6]</a></sup>，但公报没有区分新引进的人和原来就在丙市工作的人，这个数不能当成「引进了多少人」<sup class="doc-cite"><a href="#doc-ref-6" title="《丙市统计公报 2024》（虚构）">[6]</a></sup>。其他三个市的落户条件仍与社保年限挂钩<sup class="doc-cite"><a href="#doc-ref-5" title="《丙市人才落户实施细则》（虚构）">[5]</a></sup>。</p>
+<p>最后看住房。丁市对首次就业 3 年内的青年人才提供人才公寓，租金为市场价的 70%<sup class="doc-cite"><a href="#doc-ref-7" title="《丁市青年人才住房保障办法》（虚构）">[7]</a></sup>。丁市人才服务中心的年报说，人才公寓是丁市引才的主要手段<sup class="doc-cite"><a href="#doc-ref-8" title="《丁市人才服务中心年报 2024》（虚构）">[8]</a></sup>，但没有公布房源数量，排队情况说不清。</p>
+<div class="doc-table-wrap"><table><thead><tr><th>措施</th><th>甲市</th><th>乙市</th><th>丙市</th><th>丁市</th></tr></thead><tbody><tr><td>主要手段</td><td>按学历分档的补贴</td><td>高层次人才奖励</td><td>放宽落户</td><td>人才公寓</td></tr><tr><td>覆盖人群</td><td>所有应届毕业生</td><td>认定的高层次人才</td><td>大专以上学历</td><td>首次就业的青年人才</td></tr></tbody></table></div>
+</section>
+<section class="doc-sec" id="doc-s3">
+<h2><span class="doc-secnum">3</span>三、几点提醒</h2>
+<p>第一，四个市的政策都在 2024 年前后调整过<sup class="doc-cite"><a href="#doc-ref-1" title="《长三角人才政策比较研究（2025）》（虚构）">[1]</a></sup>，以后还可能再变，用这份材料时要核对最新的文件<sup class="doc-cite"><a href="#doc-ref-2" title="《甲市人才安居实施办法（2024 年修订）》（虚构）">[2]</a></sup><sup class="doc-cite"><a href="#doc-ref-7" title="《丁市青年人才住房保障办法》（虚构）">[7]</a></sup>。第二，各市都没有公布补贴的实际发放金额，要比较效果，需要另外找各市的发放数据<sup class="doc-cite"><a href="#doc-ref-3" title="《甲市 2025 年人才工作要点》（虚构）">[3]</a></sup>。第三，乙市的「人才」认定标准由乙市自己定<sup class="doc-cite"><a href="#doc-ref-4" title="《乙市高层次人才引进若干措施》（虚构）">[4]</a></sup>，和其他三个市不是一个口径。</p>
+</section>
+</main>
+<section class="doc-refs" id="references">
+<h2><span class="doc-secnum">R</span>参考资料</h2>
+<ol class="doc-ref-list">
+<li id="doc-ref-1"><span class="doc-ref-no">1</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/comparative-study-2025.html">《长三角人才政策比较研究（2025）》（虚构）</a> <span class="doc-tier doc-tier-B">二手(B级)</span> <span class="doc-flag">转引自 研究报告自述，未列出逐市依据</span></div><div class="doc-ref-m">第二章</div><div class="doc-ref-m doc-mono">2025-04-30</div></div></li>
+<li id="doc-ref-2"><span class="doc-ref-no">2</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/jia-housing-2024.pdf">《甲市人才安居实施办法（2024 年修订）》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第五条</div><div class="doc-ref-m doc-mono">2024-07-01</div></div></li>
+<li id="doc-ref-3"><span class="doc-ref-no">3</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/jia-work-points-2025.pdf">《甲市 2025 年人才工作要点》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">第二部分</div><div class="doc-ref-m doc-mono">2025-02-20</div></div></li>
+<li id="doc-ref-4"><span class="doc-ref-no">4</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/yi-high-level-2024.pdf">《乙市高层次人才引进若干措施》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第三条</div><div class="doc-ref-m doc-mono">2024-03-15</div></div></li>
+<li id="doc-ref-5"><span class="doc-ref-no">5</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/bing-hukou-2024.pdf">《丙市人才落户实施细则》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第二章</div><div class="doc-ref-m doc-mono">2024-01-10</div></div></li>
+<li id="doc-ref-6"><span class="doc-ref-no">6</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/bing-bulletin-2024.pdf">《丙市统计公报 2024》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">表 6</div><div class="doc-ref-m doc-mono">2025-03-20</div></div></li>
+<li id="doc-ref-7"><span class="doc-ref-no">7</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/ding-apartments-2024.pdf">《丁市青年人才住房保障办法》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第四条</div><div class="doc-ref-m doc-mono">2024-09-01</div></div></li>
+<li id="doc-ref-8"><span class="doc-ref-no">8</span><div><div class="doc-ref-t"><a href="https://example.org/yangtze-talent/ding-service-centre-2024.pdf">《丁市人才服务中心年报 2024》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">第三部分</div><div class="doc-ref-m doc-mono">2025-01-25</div></div></li>
+</ol>
+<p class="doc-foot">来源层级:A=官方/院校一手文件,A−=机构自报披露,B=行业协会/媒体/平台(二手)。</p>
+</section>
+</div>
+</body></html>

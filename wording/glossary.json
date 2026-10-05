@@ -1,0 +1,921 @@
+{
+  "schema": "yunzhi.glossary/1",
+  "version": "0.2.0",
+  "updated": "2026-10-02",
+  "about": "用户可见用词的单一来源：内部词 → 对用户的说法。内部文件、脚本、规格里的原词保留不动；只换对用户说的话。扫描器（banned-terms.json）、skill 里的「对用户说话」一节都从这里取词。",
+  "source": {
+    "entries": "云织CIS/10-v0.2桌面版/03-用户可见文字盘点.md §3.2 对照表（2026-09-28 草案）；row 字段逐字抄该表第一栏，treatment 逐字抄「处理」栏",
+    "principles": "同上 §3.1，按 9-29 的决定把「任务书」换成「任务计划」",
+    "keep_words": "同上 §3.3",
+    "names": "工单 00-第一批工单-非UI-2026-09-29 §五 W1 与产品方案 §1.6"
+  },
+  "columns": {
+    "zh": "对用户说（中文）",
+    "gloss": "第一次提到时可以带上的一句解释",
+    "en": "英文说法，留给以后；现在一律为 null"
+  },
+  "actions": {
+    "rename": "对用户换成 zh",
+    "prefer": "原词可以留，建议用 zh",
+    "keep": "研究员本来就懂，照用（可能有限制，见 note）",
+    "hide": "不该出现在用户面前；需要时换说法或干脆不说"
+  },
+  "groups": {
+    "A": "文体与方法",
+    "B": "流程与确认",
+    "C": "产物与文件",
+    "D": "证据与规则",
+    "E": "检查器与环境"
+  },
+  "decisions": [
+    {
+      "date": "2026-09-29",
+      "by": "Rick",
+      "what": "task_plan 对用户叫「任务计划」，不叫「任务书」",
+      "overrides": "03 §3.1 原则一、原则二与 §3.2「对接窗口」「正本」「task_plan」三行草案里的「任务书」"
+    },
+    {
+      "date": "2026-09-29",
+      "by": "工单 00 §五 W1 / 产品方案 §1.6",
+      "what": "确认相关的叫法：确认点 / 确认卡 / 确认记录"
+    },
+    {
+      "date": "2026-09-29",
+      "by": "工单 00 §五 W1 / 产品方案 §1.3",
+      "what": "研究流程的四个环节对用户叫：明确任务 · 收集资料 · 拟定提纲 · 撰写交付"
+    },
+    {
+      "date": "2026-09-29",
+      "by": "工单 00 §五 W1 / 产品方案 §1.6",
+      "what": "argument / survey 对用户叫：研判型 / 综述型（产品方案注明这条最没把握，会给测试员看）"
+    },
+    {
+      "date": "2026-10-01",
+      "by": "Rick（确认卡文字模板第 2 稿；界面实装工单 05 §二）",
+      "what": "三点统一叫「改动内容 / 最薄弱的依据 / 最可能出错的地方」，改流程卡的那一点叫「改动环节」；确认卡编号写「第 1 次确认」，不写「1 / 3」",
+      "overrides": "§3.2「① 口径承诺」一行原定的「改动」；「对接窗口1/2/3」三行原定的「第一 / 第二 / 第三确认点」"
+    }
+  ],
+  "principles": [
+    "不出现英文内部词、编号和文件名：argument、E4、task_plan.md、hash 这类。需要指代某个东西时，用它的研究员名称加版本，例如「任务计划第 2 版」。",
+    "每个内部对象只用一个研究员名称：任务计划、资料汇编、提纲、成稿、资料卡片、参考文献清单。不要一会儿叫正本、一会儿叫 dossier。",
+    "流程动作说成「确认 / 修改 / 重新确认」，不说落章、作废、重弹、推进 collecting。",
+    "检查结果只说「有什么事需要你知道或决定」，不报检查项名，也不报 PASS/FAIL。",
+    "方法论的动作说成它对报告的影响。例如不说「预注册」，说「先把几种可能的结论和判定标准写下来，结论就不会随着证据被挪」。"
+  ],
+  "stages_about": "id 是任务计划 frontmatter 里 stages 字段用的机器键，与 toolkit/scripts/pipeline_lib.py 的 STAGES / STAGE_STATES 同源（由测试核对）。",
+  "stages": [
+    {
+      "id": "task",
+      "zh": "明确任务",
+      "states": ["planning", "gate1_awaiting", "gate1_approved"],
+      "object": "task_plan",
+      "object_zh": "任务计划",
+      "signoff_zh": "第 1 次确认（任务计划）",
+      "en": null
+    },
+    {
+      "id": "sources",
+      "zh": "收集资料",
+      "states": ["collecting", "gate2_awaiting", "gate2_approved"],
+      "object": "dossier",
+      "object_zh": "资料汇编",
+      "signoff_zh": "第 2 次确认（资料汇编）",
+      "en": null
+    },
+    {
+      "id": "outline",
+      "zh": "拟定提纲",
+      "states": ["outlining", "gate3_awaiting", "gate3_approved"],
+      "object": "outline",
+      "object_zh": "提纲",
+      "signoff_zh": "第 3 次确认（提纲）",
+      "en": null
+    },
+    {
+      "id": "delivery",
+      "zh": "撰写交付",
+      "states": ["drafting", "verifying", "delivered"],
+      "object": "成品",
+      "object_zh": "成稿",
+      "signoff_zh": "交付确认",
+      "en": null
+    }
+  ],
+  "statuses": {
+    "planning": "正在明确任务",
+    "gate1_awaiting": "等你确认任务计划",
+    "gate1_approved": "任务计划已确认",
+    "collecting": "正在收集资料",
+    "gate2_awaiting": "等你确认资料汇编",
+    "gate2_approved": "资料汇编已确认",
+    "outlining": "正在拟定提纲",
+    "gate3_awaiting": "等你确认提纲",
+    "gate3_approved": "提纲已确认",
+    "drafting": "正在写成稿",
+    "verifying": "交付前的自动检查",
+    "delivered": "已交付"
+  },
+  "keep_words": [
+    { "word": "口径", "limit": "只用统计口径、数据口径的本义；「口径承诺」「项目口径」「口径放宽」要改写" },
+    { "word": "综述", "limit": "不说 survey" },
+    { "word": "假设", "limit": "不用 H1/H2 这类编号" },
+    { "word": "反例 / 边界案例", "limit": null },
+    { "word": "缺口", "limit": "不带 gap 和状态码" },
+    { "word": "转引", "limit": null },
+    { "word": "复核", "limit": null },
+    { "word": "红线", "limit": "不带编号，每条用一句大白话说" },
+    { "word": "判定标准", "limit": null },
+    { "word": "一手资料 / 二手资料", "limit": null },
+    { "word": "截至（数据截至某日）", "limit": null },
+    { "word": "概念界定", "limit": null },
+    { "word": "提纲 / 大纲", "limit": null },
+    { "word": "成稿", "limit": null },
+    { "word": "确认", "limit": null }
+  ],
+  "understandable_not_for_titles": ["命题", "论证", "证据卡", "过度推断"],
+  "entries": [
+    {
+      "id": "argument",
+      "group": "A",
+      "row": "argument / 论证型",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["argument", "论证型"], "action": "rename", "zh": "研判型", "gloss": "要对一个判断给出结论和依据", "en": null }
+      ],
+      "note": "「研判」是政策研究圈的日常词（形势研判、风险研判）。产品方案 §1.6：这条最没把握，会给测试员看。"
+    },
+    {
+      "id": "survey",
+      "group": "A",
+      "row": "survey / 综述型",
+      "treatment": "留「综述」",
+      "skills": "all",
+      "terms": [
+        { "internal": ["survey"], "action": "rename", "zh": "综述型", "gloss": "梳理现状、归纳观点，不下结论", "en": null },
+        { "internal": ["综述型", "综述"], "action": "keep", "zh": "综述型", "en": null }
+      ]
+    },
+    {
+      "id": "genre",
+      "group": "A",
+      "row": "文体 / 文体判定",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["文体"], "action": "rename", "zh": "报告类型", "en": null },
+        { "internal": ["文体判定"], "action": "rename", "zh": "定报告类型", "gloss": "研判型还是综述型", "en": null }
+      ],
+      "note": "中文「文体」偏写作风格或公文文种，读不出「要不要下结论」这层意思。"
+    },
+    {
+      "id": "preregistration",
+      "group": "A",
+      "row": "预注册 / 预注册结论空间 A/B/C",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["预注册"], "action": "rename", "zh": "事先写好判定标准", "gloss": "动手找资料前，先写好几种可能的结论和各自的判定标准", "en": null },
+        { "internal": ["预注册结论空间", "A/B/C"], "action": "rename", "zh": "几种可能的结论：成立 / 部分成立 / 不成立", "en": null }
+      ],
+      "note": "结论字母对用户直接写结论：A → 成立，B → 部分成立，C → 不成立（03 §四 第 13 项）。"
+    },
+    {
+      "id": "hypothesis-ids",
+      "group": "A",
+      "row": "H1/H2",
+      "treatment": "改",
+      "skills": ["task-planner", "evidence-card"],
+      "terms": [
+        { "internal": ["H1", "H2"], "action": "rename", "zh": "假设一 / 假设二", "gloss": "或直接写「强一点的说法 / 弱一点的说法」", "en": null }
+      ],
+      "note": "发行包里当假设编号用 0 次，是 agent 自己加的。"
+    },
+    {
+      "id": "hypothesis",
+      "group": "A",
+      "row": "假设",
+      "treatment": "留",
+      "skills": [],
+      "terms": [
+        { "internal": ["假设"], "action": "keep", "zh": "假设", "en": null }
+      ]
+    },
+    {
+      "id": "falsifiable",
+      "group": "A",
+      "row": "可证伪 / 证伪 / 证伪出口",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["可证伪", "证伪"], "action": "rename", "zh": "能用证据检验", "gloss": "证据可能支持，也可能推翻", "en": null },
+        { "internal": ["证伪出口"], "action": "rename", "zh": "证据不支持时怎么收尾", "en": null }
+      ]
+    },
+    {
+      "id": "thesis",
+      "group": "A",
+      "row": "thesis / 可证伪命题",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["thesis", "可证伪命题"], "action": "rename", "zh": "核心判断", "en": null }
+      ]
+    },
+    {
+      "id": "promote",
+      "group": "A",
+      "row": "升格",
+      "treatment": "改",
+      "skills": ["task-planner", "cite-trace", "review-module"],
+      "terms": [
+        { "internal": ["升格"], "action": "rename", "zh": "改为", "note": "选项里通常直接删去（03 §3.4）", "en": null }
+      ]
+    },
+    {
+      "id": "checkpoint",
+      "group": "A",
+      "row": "闸门 / 证据对接窗口（式⑧）/ 闸门宣判",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["闸门", "证据对接窗口"], "action": "rename", "zh": "中途检查点", "gloss": "前提不成立，后面就不做", "en": null },
+        { "internal": ["闸门宣判"], "action": "rename", "zh": "检查点的结论", "en": null }
+      ],
+      "note": "「闸门」可能是用户领域里的真实用词（如水利的「闸门标定」）：替换时不能碰用户原文。"
+    },
+    {
+      "id": "criteria",
+      "group": "A",
+      "row": "判定条件 / 判定表",
+      "treatment": "留",
+      "skills": [],
+      "terms": [
+        { "internal": ["判定条件", "判定表"], "action": "keep", "zh": "判定标准", "en": null }
+      ]
+    },
+    {
+      "id": "operational-definition",
+      "group": "A",
+      "row": "操作定义 / 概念定义表",
+      "treatment": "改",
+      "skills": ["task-planner"],
+      "terms": [
+        { "internal": ["操作定义", "概念定义表"], "action": "rename", "zh": "概念界定", "gloss": "怎么算、包括什么、不包括什么", "en": null }
+      ],
+      "note": "「概念界定」是中文论文里的标准小节名。"
+    },
+    {
+      "id": "construct",
+      "group": "A",
+      "row": "变量操作化 / 构念",
+      "treatment": "藏 / 改",
+      "skills": ["task-planner"],
+      "terms": [
+        { "internal": ["变量操作化", "构念"], "action": "rename", "zh": "指标怎么选、怎么量", "note": "目前不在可见区；能不提就不提，非提不可时这么说", "en": null }
+      ]
+    },
+    {
+      "id": "contrast-evidence",
+      "group": "A",
+      "row": "对照证据（agent 自拟的「强弱两套对照证据」）",
+      "treatment": "改",
+      "skills": ["task-planner", "evidence-card"],
+      "terms": [
+        { "internal": ["对照证据", "强弱两套对照证据"], "action": "rename", "zh": "正反两方面的证据", "en": null }
+      ]
+    },
+    {
+      "id": "signoff-point",
+      "group": "B",
+      "row": "对接窗口 / 窗口",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["对接窗口", "窗口"], "action": "rename", "zh": "确认点", "en": null },
+        { "internal": ["对接窗口1"], "action": "rename", "zh": "第 1 次确认（任务计划）", "en": null },
+        { "internal": ["对接窗口2"], "action": "rename", "zh": "第 2 次确认（资料汇编）", "en": null },
+        { "internal": ["对接窗口3"], "action": "rename", "zh": "第 3 次确认（提纲）", "en": null },
+        { "internal": ["交付对接窗口"], "action": "rename", "zh": "交付确认", "en": null }
+      ],
+      "override": "03 草案写「第一确认点（任务书）」；按 Rick 9-29 的决定改为「任务计划」；Rick 10-01（确认卡文字模板第 2 稿）编号改为「第 1 次确认」。",
+      "note": "「窗口」单字在用户领域里可能是「时间窗口」「政策窗口期」，所以禁用词表只收它的复合形式。"
+    },
+    {
+      "id": "signoff-card",
+      "group": "B",
+      "row": "窗口卡 / 窗口报告",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["窗口卡"], "action": "rename", "zh": "确认卡", "en": null },
+        { "internal": ["窗口报告"], "action": "rename", "zh": "确认材料", "gloss": "也可以叫「阶段小结」", "en": null }
+      ]
+    },
+    {
+      "id": "signoff-record",
+      "group": "B",
+      "row": "印章 / 落章 / 盖章",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["落章", "盖章"], "action": "rename", "zh": "确认", "en": null },
+        { "internal": ["印章"], "action": "rename", "zh": "确认记录", "en": null },
+        { "internal": ["已落章", "印章有效"], "action": "rename", "zh": "已确认", "en": null }
+      ],
+      "note": "中文机构语境里盖章意味着公章和法律效力，太重。"
+    },
+    {
+      "id": "stale",
+      "group": "B",
+      "row": "stale / 作废 / 印章失效",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["stale", "作废", "印章失效"], "action": "rename", "zh": "需要重新确认", "gloss": "确认后内容又改过", "en": null }
+      ]
+    },
+    {
+      "id": "re-signoff",
+      "group": "B",
+      "row": "重过窗口 / 重弹 / 重渲",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["重过窗口", "重弹"], "action": "rename", "zh": "改好后再请你确认一次", "en": null },
+        { "internal": ["重渲"], "action": "rename", "zh": "重新生成", "en": null }
+      ]
+    },
+    {
+      "id": "preview",
+      "group": "B",
+      "row": "预告 / 执行预告 / 交付预告",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["预告", "执行预告"], "action": "rename", "zh": "接下来要做的事", "en": null },
+        { "internal": ["交付预告"], "action": "rename", "zh": "交付前确认", "en": null }
+      ]
+    },
+    {
+      "id": "three-points",
+      "group": "B",
+      "row": "判断三行（整块）",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["判断三行", "承诺三行", "本轮承诺"], "action": "rename", "zh": "请你重点看这三点", "en": null }
+      ]
+    },
+    {
+      "id": "point-changes",
+      "group": "B",
+      "row": "① 口径承诺 / 写作期间我改了什么已批的",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["口径承诺", "写作/返修期间我改了什么已批的", "改了什么已批的"], "action": "rename", "zh": "改动内容", "gloss": "这一轮改了哪些你确认过的内容；第 1 版写「这是第 1 版」，没改写「没有改动」", "en": null }
+      ],
+      "override": "03 草案为「改动」；Rick 10-01（确认卡文字模板第 2 稿）定为「改动内容」，卡上与正本里都用这个标签。",
+      "note": "这一条的内容本来就是「改了什么已批的」，「口径承诺」这个标签连内部都对不上。"
+    },
+    {
+      "id": "point-weakest",
+      "group": "B",
+      "row": "② 最脆证据 / 成品最脆的一处",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["最脆证据", "成品最脆的一处"], "action": "rename", "zh": "最薄弱的依据", "en": null }
+      ]
+    },
+    {
+      "id": "point-likely-wrong",
+      "group": "B",
+      "row": "③ 最可能错在哪（可验证预测）",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["最可能错在哪", "可验证预测"], "action": "rename", "zh": "最可能出错的地方", "gloss": "以及怎么核对", "en": null }
+      ]
+    },
+    {
+      "id": "option-confirm",
+      "group": "B",
+      "row": "[确认]「落章 task_plan + 推进 collecting」",
+      "treatment": "改",
+      "skills": [],
+      "terms": [
+        { "internal": ["落章 task_plan + 推进 collecting"], "action": "rename", "zh": "确认，开始收集资料", "gloss": "任务计划按这一版定下，以后要改会再请你确认", "en": null },
+        { "internal": ["落章 dossier + 推进 outlining"], "action": "rename", "zh": "确认，开始拟提纲", "gloss": "资料汇编按这一版定下，以后要改会再请你确认", "en": null },
+        { "internal": ["落章 outline + 推进 drafting"], "action": "rename", "zh": "确认，开始写作", "gloss": "提纲按这一版定下，以后要改会再请你确认", "en": null }
+      ],
+      "note": "确认卡的选项与说明属于卡片文字模板，留待界面讨论（工单 00 §八）；所以 skills 为空，skill 里暂不写这几行。"
+    },
+    {
+      "id": "option-hold",
+      "group": "B",
+      "row": "[on hold]「收轮,改预告后重弹,不落章」",
+      "treatment": "改",
+      "skills": [],
+      "terms": [
+        { "internal": ["on hold", "收轮,改预告后重弹,不落章"], "action": "rename", "zh": "先不确认", "gloss": "我按你的意见修改，改好再请你确认", "en": null }
+      ],
+      "note": "卡片文字模板，留待界面讨论。"
+    },
+    {
+      "id": "option-deliver",
+      "group": "B",
+      "row": "[交付]「盖交付印章 + 归档入库 + 写 PROGRESS —— 不可逆」",
+      "treatment": "改",
+      "skills": [],
+      "terms": [
+        { "internal": ["盖交付印章 + 归档入库 + 写 PROGRESS —— 不可逆"], "action": "rename", "zh": "交付成稿", "gloss": "交付后不能撤回；本次的来源和资料缺口会存档，留给以后的课题", "en": null }
+      ],
+      "note": "卡片文字模板，留待界面讨论。"
+    },
+    {
+      "id": "option-revise",
+      "group": "B",
+      "row": "[再改改]「不落章,回写作/返修」",
+      "treatment": "改",
+      "skills": [],
+      "terms": [
+        { "internal": ["不落章,回写作/返修"], "action": "rename", "zh": "先不交付，回去改", "en": null }
+      ],
+      "note": "卡片文字模板，留待界面讨论。"
+    },
+    {
+      "id": "pause-quick-cascade",
+      "group": "B",
+      "row": "收轮 / 秒批 / 级联裁决",
+      "treatment": "改",
+      "skills": ["task-planner", "evidence-card", "outline-cocreate"],
+      "terms": [
+        { "internal": ["收轮"], "action": "rename", "zh": "本轮先停", "en": null },
+        { "internal": ["秒批"], "action": "rename", "zh": "可以直接确认", "en": null },
+        { "internal": ["级联裁决"], "action": "rename", "zh": "后面几份已经确认过的材料，是保留还是重做", "en": null }
+      ]
+    },
+    {
+      "id": "exit-contract",
+      "group": "B",
+      "row": "出口契约 / 出口 / E1–E5",
+      "treatment": "改 / 藏",
+      "skills": "all",
+      "terms": [
+        { "internal": ["出口契约", "出口"], "action": "rename", "zh": "这一步完成的标准", "en": null },
+        { "internal": ["E1–E5"], "action": "hide", "zh": null, "skill_label": "出口条件的编号（E 加数字）", "note": "不显示编号", "en": null }
+      ]
+    },
+    {
+      "id": "stage-names",
+      "group": "B",
+      "row": "状态名 planning…delivered / 阶段一…四",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["planning", "阶段一"], "action": "rename", "zh": "明确任务", "en": null },
+        { "internal": ["collecting", "阶段二"], "action": "rename", "zh": "收集资料", "en": null },
+        { "internal": ["outlining", "阶段三"], "action": "rename", "zh": "拟定提纲", "en": null },
+        { "internal": ["drafting", "verifying", "delivered", "阶段四"], "action": "rename", "zh": "撰写交付", "en": null }
+      ],
+      "note": "每个状态的细说法见 statuses。插件旧用的「立项 / 找资料 / 搭结构 / 写成稿」不用：「立项」在课题制里指资助方批准立项，意思会错。"
+    },
+    {
+      "id": "pipeline",
+      "group": "B",
+      "row": "管线",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["管线"], "action": "rename", "zh": "研究流程", "en": null }
+      ]
+    },
+    {
+      "id": "canonical",
+      "group": "C",
+      "row": "正本",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["正本"], "action": "rename", "zh": "任务计划 / 资料汇编 / 提纲 / 底稿", "gloss": "按对象叫，不用统称", "en": null }
+      ],
+      "override": "03 草案第一项是「任务书」；按 Rick 9-29 的决定改为「任务计划」。",
+      "note": "中文「正本」是和「副本」相对的那个词（法律、档案用语），读不出「唯一依据」的意思。"
+    },
+    {
+      "id": "task-plan",
+      "group": "C",
+      "row": "task_plan",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["task_plan", "task_plan.md"], "action": "rename", "zh": "任务计划", "gloss": "要指版本时说「任务计划第 2 版」", "en": null }
+      ],
+      "override": "03 草案为「任务书」；Rick 9-29 定为「任务计划」（按原文直译）。",
+      "retired_zh": ["任务书"]
+    },
+    {
+      "id": "dossier",
+      "group": "C",
+      "row": "dossier / 汇编综合",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["dossier", "dossier.md", "汇编综合"], "action": "rename", "zh": "资料汇编", "gloss": "含初步结论", "en": null }
+      ]
+    },
+    {
+      "id": "outline",
+      "group": "C",
+      "row": "outline / 大纲",
+      "treatment": "改英文，「大纲」留",
+      "skills": "all",
+      "terms": [
+        { "internal": ["outline", "outline.md"], "action": "rename", "zh": "提纲", "en": null },
+        { "internal": ["大纲"], "action": "keep", "zh": "大纲", "note": "以「提纲」为主（环节名是「拟定提纲」），「大纲」也可以", "en": null }
+      ]
+    },
+    {
+      "id": "evidence-card",
+      "group": "C",
+      "row": "证据卡",
+      "treatment": "可以留，建议改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["证据卡"], "action": "prefer", "zh": "资料卡片", "note": "界面上叫资料卡片；成稿里不写卡数", "en": null }
+      ],
+      "note": "改名有耦合：交付检查 ⑩ 用正则找成稿里自述的「N 张证据卡」（pipeline_lib.py 的 SELF_CARD_RE，03 §4.2）。只改对用户的说法，内部文件与脚本保留「证据卡」。"
+    },
+    {
+      "id": "references",
+      "group": "C",
+      "row": "登记表 / references.yaml",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["登记表", "references.yaml"], "action": "rename", "zh": "参考文献清单", "en": null }
+      ]
+    },
+    {
+      "id": "placeholder",
+      "group": "C",
+      "row": "占位 [[R###]]",
+      "treatment": "藏",
+      "skills": "all",
+      "terms": [
+        { "internal": ["[[R###]]", "占位"], "action": "hide", "zh": null, "skill_label": "引文占位符 [[R###]]", "en": null }
+      ]
+    },
+    {
+      "id": "deliverable",
+      "group": "C",
+      "row": "成品",
+      "treatment": "可以留",
+      "skills": "all",
+      "terms": [
+        { "internal": ["成品"], "action": "prefer", "zh": "成稿", "en": null }
+      ]
+    },
+    {
+      "id": "render",
+      "group": "C",
+      "row": "渲染",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["渲染"], "action": "rename", "zh": "生成", "en": null }
+      ]
+    },
+    {
+      "id": "formats",
+      "group": "C",
+      "row": "html / docx / 双格式",
+      "treatment": "改",
+      "skills": ["task-planner", "outline-cocreate", "cite-trace"],
+      "terms": [
+        { "internal": ["html"], "action": "rename", "zh": "网页版", "en": null },
+        { "internal": ["docx"], "action": "rename", "zh": "Word 版", "en": null },
+        { "internal": ["双格式"], "action": "rename", "zh": "两种都要", "en": null }
+      ]
+    },
+    {
+      "id": "internal-fields",
+      "group": "C",
+      "row": "frontmatter · commitments · PROGRESS · hash · 元信息条 · `<project>` · `<toolkit>` · 工具包 · uid · stance · evidence_mode",
+      "treatment": "藏",
+      "skills": "all",
+      "terms": [
+        { "internal": ["frontmatter", "commitments", "PROGRESS", "hash", "元信息条", "<project>", "<toolkit>", "工具包", "uid", "stance", "evidence_mode"], "action": "hide", "zh": null, "note": "需要标版本就写「第 n 版」", "en": null }
+      ]
+    },
+    {
+      "id": "caliber",
+      "group": "D",
+      "row": "口径",
+      "treatment": "留（有限制）",
+      "skills": ["task-planner", "evidence-card", "review-module"],
+      "terms": [
+        { "internal": ["口径"], "action": "keep", "zh": "口径", "note": "只用统计口径、数据口径的本义", "en": null },
+        { "internal": ["项目口径"], "action": "rename", "zh": "研究范围", "gloss": "行业范围、时间段、地域层级", "en": null },
+        { "internal": ["口径放宽"], "action": "rename", "zh": "放宽资料要求", "note": "日常说「放宽口径」是扩大统计范围，意思正好相反", "en": null }
+      ],
+      "note": "「口径承诺」见 point-changes。"
+    },
+    {
+      "id": "scope",
+      "group": "D",
+      "row": "scope",
+      "treatment": "改",
+      "skills": ["task-planner"],
+      "terms": [
+        { "internal": ["scope"], "action": "rename", "zh": "研究范围", "en": null }
+      ]
+    },
+    {
+      "id": "source-tier",
+      "group": "D",
+      "row": "证据等级 / tier / A、A−、B",
+      "treatment": "改字母，留「一手 / 二手」",
+      "skills": ["evidence-card", "cite-trace", "review-module"],
+      "terms": [
+        { "internal": ["证据等级", "tier"], "action": "rename", "zh": "来源类型", "en": null },
+        { "internal": ["A", "A级"], "action": "rename", "zh": "官方一手", "en": null },
+        { "internal": ["A−", "A-"], "action": "rename", "zh": "机构自报", "en": null },
+        { "internal": ["B", "B级"], "action": "rename", "zh": "二手", "en": null }
+      ],
+      "note": "三类的定义要统一：evidence-tiers.md 与成稿页脚对 A、B 的说法不一致（03 §四 第 8 项）。"
+    },
+    {
+      "id": "strength",
+      "group": "D",
+      "row": "强度 strong / medium_strong / medium / weak / MED",
+      "treatment": "改",
+      "skills": ["evidence-card", "review-module"],
+      "terms": [
+        { "internal": ["强度"], "action": "rename", "zh": "证据强弱", "note": "本表补：产品方案 C3 用「证据强弱」", "en": null },
+        { "internal": ["strong"], "action": "rename", "zh": "证据充分", "en": null },
+        { "internal": ["medium_strong"], "action": "rename", "zh": "较充分", "en": null },
+        { "internal": ["medium", "MED"], "action": "rename", "zh": "一般", "en": null },
+        { "internal": ["weak"], "action": "rename", "zh": "不足", "en": null }
+      ]
+    },
+    {
+      "id": "redline",
+      "group": "D",
+      "row": "红线 R1–R12",
+      "treatment": "留词，藏编号",
+      "skills": ["evidence-card", "review-module"],
+      "terms": [
+        { "internal": ["红线"], "action": "keep", "zh": "红线", "note": "每条用一句大白话说", "en": null },
+        { "internal": ["R1–R12"], "action": "hide", "zh": null, "skill_label": "红线的编号", "en": null }
+      ]
+    },
+    {
+      "id": "discipline",
+      "group": "D",
+      "row": "D1–D17 / 纪律 / 纪律库",
+      "treatment": "藏编号",
+      "skills": ["evidence-card", "review-module"],
+      "terms": [
+        { "internal": ["D1–D17"], "action": "hide", "zh": null, "skill_label": "纪律的编号（D 加数字）", "en": null },
+        { "internal": ["纪律", "纪律库"], "action": "rename", "zh": "默认规范", "en": null }
+      ]
+    },
+    {
+      "id": "quoted-from",
+      "group": "D",
+      "row": "转引",
+      "treatment": "留",
+      "skills": [],
+      "terms": [
+        { "internal": ["转引"], "action": "keep", "zh": "转引", "en": null }
+      ]
+    },
+    {
+      "id": "fetch-states",
+      "group": "D",
+      "row": "五态 ok / empty / gap / failed / blocked",
+      "treatment": "改",
+      "skills": ["evidence-card", "cite-trace"],
+      "terms": [
+        { "internal": ["ok"], "action": "rename", "zh": "已取得", "en": null },
+        { "internal": ["empty"], "action": "rename", "zh": "查了但没有内容", "en": null },
+        { "internal": ["gap"], "action": "rename", "zh": "没有这项数据", "en": null },
+        { "internal": ["failed"], "action": "rename", "zh": "没取到（出错）", "en": null },
+        { "internal": ["blocked"], "action": "rename", "zh": "打不开", "en": null },
+        { "internal": ["五态"], "action": "hide", "zh": null, "en": null }
+      ]
+    },
+    {
+      "id": "gap",
+      "group": "D",
+      "row": "gap / 缺口",
+      "treatment": "留「缺口」，去掉 gap",
+      "skills": ["evidence-card", "cite-trace"],
+      "terms": [
+        { "internal": ["gap", "gap 卡"], "action": "rename", "zh": "资料缺口", "en": null },
+        { "internal": ["缺口"], "action": "keep", "zh": "缺口", "en": null }
+      ]
+    },
+    {
+      "id": "liveness",
+      "group": "D",
+      "row": "liveness",
+      "treatment": "改",
+      "skills": ["evidence-card", "cite-trace"],
+      "terms": [
+        { "internal": ["liveness"], "action": "rename", "zh": "链接还能不能打开", "en": null }
+      ]
+    },
+    {
+      "id": "rule-trace",
+      "group": "D",
+      "row": "rule_trace / override_reason",
+      "treatment": "改",
+      "skills": ["evidence-card", "review-module"],
+      "terms": [
+        { "internal": ["rule_trace"], "action": "rename", "zh": "强度依据", "en": null },
+        { "internal": ["override_reason"], "action": "rename", "zh": "例外说明", "en": null }
+      ]
+    },
+    {
+      "id": "moves",
+      "group": "D",
+      "row": "聚合 / 招式 / 式①",
+      "treatment": "藏",
+      "skills": "all",
+      "terms": [
+        { "internal": ["聚合", "招式", "式①"], "action": "hide", "zh": null, "skill_label": "聚合、招式、式①这类招式编号", "en": null }
+      ]
+    },
+    {
+      "id": "dossier-layers",
+      "group": "D",
+      "row": "结论层 / 边界层 / 闸门层 / 索引层",
+      "treatment": "改（去掉「层」）",
+      "skills": ["evidence-card", "review-module"],
+      "terms": [
+        { "internal": ["结论层"], "action": "rename", "zh": "初步结论", "en": null },
+        { "internal": ["边界层"], "action": "rename", "zh": "适用范围与不能下的结论", "en": null },
+        { "internal": ["闸门层"], "action": "rename", "zh": "检查点结论", "en": null },
+        { "internal": ["索引层"], "action": "rename", "zh": "来源清单", "en": null }
+      ]
+    },
+    {
+      "id": "over-inference",
+      "group": "D",
+      "row": "过度推断",
+      "treatment": "留 / 微调",
+      "skills": ["evidence-card", "review-module"],
+      "terms": [
+        { "internal": ["过度推断"], "action": "prefer", "zh": "过度解读", "note": "「过度推断」也能懂", "en": null }
+      ]
+    },
+    {
+      "id": "counterexample",
+      "group": "D",
+      "row": "反例 / 边界案例",
+      "treatment": "留",
+      "skills": [],
+      "terms": [
+        { "internal": ["反例", "边界案例"], "action": "keep", "zh": "反例 / 边界案例", "en": null }
+      ]
+    },
+    {
+      "id": "review",
+      "group": "D",
+      "row": "复核 / 独立复核",
+      "treatment": "留",
+      "skills": [],
+      "terms": [
+        { "internal": ["复核", "独立复核"], "action": "keep", "zh": "复核", "gloss": "由没参与写作的助手复核", "en": null }
+      ]
+    },
+    {
+      "id": "severity",
+      "group": "D",
+      "row": "必须纠正 / 降格改准 / 技术破坏 / 保留确认",
+      "treatment": "改",
+      "skills": ["cite-trace", "review-module"],
+      "terms": [
+        { "internal": ["必须纠正"], "action": "rename", "zh": "必须改", "en": null },
+        { "internal": ["降格改准"], "action": "rename", "zh": "说法要收一收", "en": null },
+        { "internal": ["技术破坏"], "action": "rename", "zh": "引用或格式损坏", "en": null },
+        { "internal": ["保留确认"], "action": "rename", "zh": "抽查无误", "en": null }
+      ]
+    },
+    {
+      "id": "distortion",
+      "group": "D",
+      "row": "八类曲解",
+      "treatment": "改",
+      "skills": ["cite-trace", "review-module"],
+      "terms": [
+        { "internal": ["八类曲解", "曲解"], "action": "rename", "zh": "八类改写失真", "note": "「曲解」带有故意的意思", "en": null }
+      ]
+    },
+    {
+      "id": "verdict",
+      "group": "D",
+      "row": "裁定",
+      "treatment": "改",
+      "skills": ["evidence-card", "cite-trace", "review-module"],
+      "terms": [
+        { "internal": ["裁定"], "action": "rename", "zh": "结论", "en": null }
+      ]
+    },
+    {
+      "id": "outside-reads",
+      "group": "D",
+      "row": "越界 / 项目外路径",
+      "treatment": "改",
+      "skills": ["task-planner", "evidence-card", "outline-cocreate", "cite-trace"],
+      "terms": [
+        { "internal": ["越界", "项目外路径"], "action": "rename", "zh": "读过的项目以外的文件", "en": null }
+      ],
+      "note": "分组名 harness_temp 等一律不显示。"
+    },
+    {
+      "id": "engine-internals",
+      "group": "D",
+      "row": "子代理 · 会话日志 · steps / 步数",
+      "treatment": "藏",
+      "skills": "all",
+      "terms": [
+        { "internal": ["子代理", "会话日志", "steps", "步数"], "action": "hide", "zh": null, "en": null }
+      ]
+    },
+    {
+      "id": "budget",
+      "group": "D",
+      "row": "预算 / budget",
+      "treatment": "改",
+      "skills": ["task-planner", "evidence-card", "cite-trace"],
+      "terms": [
+        { "internal": ["预算", "budget"], "action": "rename", "zh": "篇幅和工作量上限", "en": null }
+      ],
+      "note": "中文「预算」默认是钱；只在指钱时才说「预算」。"
+    },
+    {
+      "id": "word-counts",
+      "group": "D",
+      "row": "Σ / 节点 / total_words / 容差",
+      "treatment": "改",
+      "skills": ["outline-cocreate", "cite-trace"],
+      "terms": [
+        { "internal": ["Σ", "Σwords"], "action": "rename", "zh": "合计字数", "en": null },
+        { "internal": ["节点"], "action": "rename", "zh": "章节", "en": null },
+        { "internal": ["total_words"], "action": "rename", "zh": "目标字数", "en": null },
+        { "internal": ["容差", "tolerance"], "action": "rename", "zh": "允许偏差", "en": null }
+      ]
+    },
+    {
+      "id": "verdict-codes",
+      "group": "E",
+      "row": "PASS / WARN / FAIL",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["PASS"], "action": "rename", "zh": "通过", "en": null },
+        { "internal": ["WARN"], "action": "rename", "zh": "提醒", "en": null },
+        { "internal": ["FAIL"], "action": "rename", "zh": "必须处理", "en": null }
+      ],
+      "note": "最好连这些也不显示，只列需要用户知道或决定的事。"
+    },
+    {
+      "id": "check-names",
+      "group": "E",
+      "row": "cite_check 等脚本名；十二项全绿",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["cite_check", "card_check", "dossier_check", "outline_check", "pipeline_status", "stamp.py", "session_facts", "render_*"], "action": "rename", "zh": "自动检查", "en": null },
+        { "internal": ["十二项全绿", "全绿"], "action": "rename", "zh": "交付前的自动检查全部通过", "en": null }
+      ]
+    },
+    {
+      "id": "checker",
+      "group": "E",
+      "row": "检查器 / 检查脚本 / 机器取值",
+      "treatment": "改",
+      "skills": "all",
+      "terms": [
+        { "internal": ["检查器", "检查脚本"], "action": "rename", "zh": "自动检查", "en": null },
+        { "internal": ["机器取值"], "action": "rename", "zh": "自动统计的数", "en": null }
+      ]
+    },
+    {
+      "id": "environment",
+      "group": "E",
+      "row": "py · pwsh · PATH · 127.0.0.1 · skill · DSH · 公理",
+      "treatment": "藏",
+      "skills": "all",
+      "terms": [
+        { "internal": ["py", "pwsh", "PATH", "127.0.0.1", "skill", "DSH", "公理"], "action": "hide", "zh": null, "en": null }
+      ]
+    }
+  ]
+}

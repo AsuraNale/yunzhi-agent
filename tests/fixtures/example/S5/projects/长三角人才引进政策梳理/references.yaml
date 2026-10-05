@@ -1,0 +1,92 @@
+kind: references
+version: 7
+updated_at: '2026-09-26T10:00:00-04:00'
+entries:
+  - id: R001
+    title: '《甲市人才安居实施办法（2024 年修订）》（虚构）'
+    url: 'https://example.org/yangtze-talent/jia-housing-2024.pdf'
+    tier: A
+    as_of: '2024-07-01'
+    locator: '第五条'
+    card: S01
+    claims_source: null
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']
+  - id: R002
+    title: '《乙市高层次人才引进若干措施》（虚构）'
+    url: 'https://example.org/yangtze-talent/yi-high-level-2024.pdf'
+    tier: A
+    as_of: '2024-03-15'
+    locator: '第三条'
+    card: S02
+    claims_source: null
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']
+  - id: R003
+    title: '《丙市人才落户实施细则》（虚构）'
+    url: 'https://example.org/yangtze-talent/bing-hukou-2024.pdf'
+    tier: A
+    as_of: '2024-01-10'
+    locator: '第二章'
+    card: S03
+    claims_source: null
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']
+  - id: R004
+    title: '《丁市青年人才住房保障办法》（虚构）'
+    url: 'https://example.org/yangtze-talent/ding-apartments-2024.pdf'
+    tier: A
+    as_of: '2024-09-01'
+    locator: '第四条'
+    card: S04
+    claims_source: null
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']
+  - id: R005
+    title: '《长三角人才政策比较研究（2025）》（虚构）'
+    url: 'https://example.org/yangtze-talent/comparative-study-2025.html'
+    tier: B
+    as_of: '2025-04-30'
+    locator: '第二章'
+    card: S05
+    claims_source: '研究报告自述，未列出逐市依据'
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']
+  - id: R006
+    title: '《甲市 2025 年人才工作要点》（虚构）'
+    url: 'https://example.org/yangtze-talent/jia-work-points-2025.pdf'
+    tier: A-
+    as_of: '2025-02-20'
+    locator: '第二部分'
+    card: S01
+    claims_source: null
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']
+  - id: R007
+    title: '《丙市统计公报 2024》（虚构）'
+    url: 'https://example.org/yangtze-talent/bing-bulletin-2024.pdf'
+    tier: A
+    as_of: '2025-03-20'
+    locator: '表 6'
+    card: S03
+    claims_source: null
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']
+  - id: R008
+    title: '《丁市人才服务中心年报 2024》（虚构）'
+    url: 'https://example.org/yangtze-talent/ding-service-centre-2024.pdf'
+    tier: A-
+    as_of: '2025-01-25'
+    locator: '第三部分'
+    card: S04
+    claims_source: null
+    unverified: false
+    liveness: {state: ok, probed_at: '2026-09-26T10:00:00-04:00', probed_from: CA-ON}
+    used_by: ['drafts/长三角人才引进政策梳理.md']

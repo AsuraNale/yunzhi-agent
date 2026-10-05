@@ -1,0 +1,17 @@
+{
+ "schema": "yunzhi-delivery/1",
+ "delivered_at": "2026-09-26T17:00:00-04:00",
+ "delivered_by": "研究员",
+ "note": "",
+ "files": [
+  {
+   "path": "out/长三角人才引进政策梳理.html",
+   "sha256": "f2b9117119e56f50553af4ce87694a4d01f5176e49b6600dfcf3e00724accf39"
+  },
+  {
+   "path": "out/长三角人才引进政策梳理.docx",
+   "sha256": "b87053f1f02868a4070b62bf1cd8452c7311c7f761c63703cfc93b8d533703c5"
+  }
+ ],
+ "signature": "v1.ed25519.5016c05c42474424.knz_RE5pM10PMDUEUI7IpbwWrGpm2uat3XGIlKCyYfNadNpWgQ2LqssuKLSdq1ImZH93mpkuIqmgC1YA_L8lBA"
+}

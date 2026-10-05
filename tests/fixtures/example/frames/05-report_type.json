@@ -1,0 +1,37 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-005",
+ "question_id": "q-fixture-005",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:report-type",
+   "question": "Choose the report type.",
+   "options": [
+    {
+     "label": "judge"
+    },
+    {
+     "label": "survey"
+    },
+    {
+     "label": "undecided"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "report-type",
+    "call_id": "call-fixture-005",
+    "kind": "report_type"
+   },
+   "card": {
+    "kind": "report_type",
+    "report_name": "内参",
+    "thesis": "下乡活动带动了县域公共充电设施增长",
+    "why": "你说「领导就想知道这钱花得值不值」，这需要一个判断。两种写法的区别在于要不要由这份报告来证明它。",
+    "recommend": "judge"
+   }
+  }
+ ]
+}

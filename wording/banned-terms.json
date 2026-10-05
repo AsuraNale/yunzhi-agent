@@ -1,0 +1,351 @@
+{
+  "schema": "yunzhi.banned-terms/1",
+  "version": "0.2.0",
+  "updated": "2026-09-29",
+  "about": "弹卡前的机器扫描用：硬名单里任何一条在用户文案字段里命中，这张卡就退回 agent 重写。软名单只给人工抽查，不进机器判定（scanner 只在 advise:true 时把它列为提醒，不影响 ok）。0.2.0 = 修补单 01 的 W 组：卡片上的引文只认与用户原话逐字相符的（Wb1）、「任务书」进硬名单（Wb2）、扫描前先归一写法变体（Wb3）、研究用语不误报（Wb4）。",
+  "source": "云织CIS/10-v0.2桌面版/03-用户可见文字盘点.md §3.5 硬黑名单草案。origin=03§3.5 的组逐条来自草案；origin=glossary 的组是从 glossary.json 的「改 / 藏」行补的；origin=decision 的组来自已定的改名。",
+  "scan_scope": {
+    "scanned": "卡片的 header / question / detail / options[].label / options[].description；界面字典的值；模板的可见文字",
+    "not_scanned": [
+      "卡片的 id、approve 以及 quotes / references / citations / sources 字段",
+      "《》里的标题",
+      "网址（本机地址 127.0.0.1 / localhost / file: 除外，它们单独报 env:local-link）",
+      "「」“”\"\"『』里、以及 markdown 引用块（行首为 >）里与用户原话（userText）逐字相符的内容；引用块逐行核对",
+      "只有自由聊天文字（scanText 且 quoteCues:true）才认提示词：紧跟在「原话 / 原文 / 你说 / 你提到 / 委托里」这类词后面的引号或引用块。卡片和界面字典一律不认"
+    ],
+    "note": "引号、引用块本身都不算豁免：agent 也会用 > 写提示、用引号标自己的术语。卡片上只有证明是用户原话（归一后逐字出现在 userText 里）才跳过；没传 userText 就一处也不跳过。"
+  },
+  "quote_cues": {
+    "about": "只在宽松模式（scanText 且 quoteCues:true，给自由聊天文字用）里生效：引号前 12 个字以内（同一行），或引用块前一行的末尾 / 引用块第一行的开头出现这些词，就把引号或引用块里的内容当作用户原话、不扫。卡片（scanCard / scanPayload）和界面字典（scanStrings）不接受宽松模式。",
+    "window": 12,
+    "words": ["原话", "原文", "你说", "你提到", "你写", "你问", "你的说法", "你用的词", "你们的说法", "委托里", "委托中", "委托说明", "你的委托"],
+    "not_cues": ["原文件", "原文档"],
+    "not_cues_about": "含有提示词、但说的是别的东西的词：「原文件」「原文档」是 agent 自己的文件，不是用户原话（W 验收的例子就是这样漏过去的）。"
+  },
+  "boundaries": {
+    "ascii-word": "前后不能紧挨 ASCII 字母、数字或下划线（相当于草案里的 \\b，但不受中文字符影响）",
+    "none": "按子串匹配"
+  },
+  "forms_about": "组上写 plurals:true 的，纯字母的英文词也认复数 -s / -es（arguments、hashes）；不规则的写在该词的 forms 里（thesis → theses）。英文词里的空格认任意空白（on hold）。",
+  "titles_about": "《》里的标题照旧不扫：真实文献标题里常有看起来像内部词的字（Survey、闸门、管线、任务书、预注册、秒批、边界层……）。只有标了 in_titles 的词在《》里也算 —— 我们自造的词与机器名字（对接窗口、落章、判断三行、task_plan、gate1_awaiting、cite_check、.md、{#commitments} 这类）不会出现在真实文献的标题里（W3-2）。「任务书」也标了 in_titles（复核，Selina 9-30）：它是弃用的旧说法，卡片上的《…任务书》多半是 agent 在说任务计划；真实文献的标题由用户原话核对放行 —— 整个《》标题逐字出现在某一条 userText 里，就算用户的（skipped 记 title-verified）。",
+  "except_about": "except = 复合词例外（字面，命中的词在这个复合词里就不算）；except_re = 领域用法例外（正则，匹配到的一段盖住命中的词就不算），每条带 example：这句不加例外会被标、加了不会（测试逐条核对）。except_re 默认沿用该词的 flags，可单独写 flags。两种例外都在归一后的文字上判断。",
+  "normalize": {
+    "about": "扫描前先把写法变体归一（src/normalize.mjs）：逐字 NFKC（全角转半角；圈码 ①、上下标、分数保留原样）、去掉零宽字符 / 软连字符 / BOM / 方向控制符 / 异体选择符、U+3164 这类看起来空白的填充符当空格、去掉两个汉字之间的空白（一个换行也算，空一行不算）、再按下表把繁体字转成简体。命中位置仍报原文里的位置。",
+    "traditional_about": "只收硬 / 软名单与例外里用到的字（加上几个常见异体：僞、彙、匯、註、誌、綫、証）。键是只在繁体里用的字，不会改动简体文字。",
+    "traditional": {
+      "對": "对", "報": "报", "過": "过", "蓋": "盖", "預": "预", "註": "注", "冊": "册", "閘": "闸", "門": "门",
+      "斷": "断", "徑": "径", "諾": "诺", "輪": "轮", "彈": "弹", "約": "约", "線": "线", "條": "条", "態": "态",
+      "紀": "纪", "庫": "库", "會": "会", "話": "话", "誌": "志", "證": "证", "偽": "伪", "僞": "伪", "體": "体",
+      "匯": "汇", "彙": "汇", "編": "编", "綜": "综", "結": "结", "論": "论", "邊": "边", "層": "层", "記": "记",
+      "雙": "双", "級": "级", "聯": "联", "決": "决", "準": "准", "術": "术", "壞": "坏", "義": "义", "構": "构",
+      "檢": "检", "腳": "脚", "機": "机", "綠": "绿", "數": "数", "務": "务", "書": "书",
+      "項": "项", "寬": "宽", "據": "据", "題": "题", "廢": "废", "節": "节", "點": "点",
+      "與": "与", "電": "电", "製": "制", "簽": "签", "審": "审", "氣": "气", "熱": "热", "產": "产", "業": "业",
+      "動": "动", "設": "设", "場": "场", "館": "馆", "廣": "广", "費": "费", "賽": "赛", "娛": "娱", "樂": "乐",
+      "應": "应", "資": "资", "車": "车", "標": "标", "譽": "誉", "評": "评", "調": "调", "給": "给", "認": "认",
+      "規": "规", "範": "范", "種": "种", "農": "农", "國": "国", "個": "个", "圍": "围", "跡": "迹", "綫": "线", "証": "证"
+    }
+  },
+  "hard": [
+    {
+      "id": "en-internal",
+      "label": "英文内部词",
+      "origin": "03§3.5",
+      "boundary": "ascii-word",
+      "flags": "i",
+      "plurals": true,
+      "note": "草案的正则没写大小写；这里除 PROGRESS 外一律不分大小写，免得 Argument、Survey 漏掉。",
+      "terms": [
+        { "t": "argument", "see": "argument" },
+        { "t": "survey", "see": "survey" },
+        { "t": "thesis", "see": "thesis", "forms": ["theses"] },
+        {
+          "t": "scope",
+          "see": "scope",
+          "except_re": [
+            { "re": "scopes?[\\s-]*[123](?![0-9])(?!\\s*(?:个(?!人|体)|项(?!目)|条(?!件|款)|点(?!源)|部分|方面|种(?!类|植)|类(?!别|型)|处(?!理)|节(?!能|约)|章|篇|份(?!额)|张|轮|版|步|块|组(?!成|织)|次(?!级|要)|位(?!居|列)|名(?!列)|件|套))", "example": "Scope 3 排放占企业碳足迹的大头", "note": "温室气体核算的范围一 / 二 / 三（Scope 1/2/3）；数字后面紧跟量词（个、项、条、种、类、节、份、张……）仍算内部词，以量词字开头的研究用语（个人、项目、条件、点源、种类、种植、类别、份额、组成、节能……）放行（W3-2）" }
+          ]
+        },
+        { "t": "dossier", "see": "dossier" },
+        { "t": "outline", "see": "outline" },
+        { "t": "task_plan", "see": "task-plan", "in_titles": true },
+        { "t": "frontmatter", "see": "internal-fields" },
+        { "t": "commitments", "see": "internal-fields", "forms": ["commitment"] },
+        { "t": "stale", "see": "stale" },
+        { "t": "hash", "see": "internal-fields" },
+        { "t": "uid", "see": "internal-fields" },
+        { "t": "stance", "see": "internal-fields" },
+        {
+          "t": "tier",
+          "see": "source-tier",
+          "except_re": [
+            { "re": "tiers?[\\s-]*(?:[123]|I{1,3})(?![0-9A-Za-z])(?!\\s*(?:个(?!人|体)|项(?!目)|条(?!件|款)|点(?!源)|部分|方面|种(?!类|植)|类(?!别|型)|处(?!理)|节(?!能|约)|章|篇|份(?!额)|张|轮|版|步|块|组(?!成|织)|次(?!级|要)|位(?!居|列)|名(?!列)|件|套))", "example": "Tier 1 供应商", "note": "一级 / 二级供应商（Tier 1/2）、一级资本（Tier 1 capital）；我们的来源分级是 A / A− / B，不带数字；量词规则同 scope（W3-2）" }
+          ]
+        },
+        { "t": "liveness", "see": "liveness" },
+        {
+          "t": "gap",
+          "see": "gap",
+          "except_re": [
+            { "re": "GAP\\s*(?:认证体系|认证|标准|规范|体系|基地|产品|管理|生产|种植|示范|certification|certified|standard)", "flags": "", "example": "通过中国 GAP 认证", "note": "良好农业规范（Good Agricultural Practices）认证，大写" },
+            { "re": "(?:良好农业规范|中国|全球|Global|China)\\s*[(（]?\\s*GAP", "flags": "", "example": "良好农业规范（GAP）", "note": "同上，名称在前" }
+          ]
+        },
+        { "re": "steps(?:_used)?", "see": "engine-internals", "example": "steps_used" },
+        { "t": "budget", "see": "budget" },
+        { "re": "skills?", "see": "environment", "example": "skills" },
+        { "t": "DSH", "see": "environment" },
+        { "t": "PROGRESS", "see": "internal-fields", "flags": "" },
+        { "t": "on hold", "see": "option-hold" },
+        { "t": "stage", "see": "stage-names", "suggest": "不写字段名：说「研究流程的几步」，或者直接说是哪一步（明确任务 / 收集资料 / 拟定提纲 / 撰写交付）", "example": "stages", "note": "云织 Agent 分支加的（10-03），客户端词表没有：stages 是任务计划里的字段名" },
+        { "t": "genre", "see": "genre", "suggest": "报告类型（下判断 / 梳理情况）", "note": "云织 Agent 分支加的（10-03），客户端词表没有：genre 是任务计划里的字段名" },
+        { "t": "claim", "see": "dossier-layers", "suggest": "不写字段名：说「初步结论」", "example": "claims", "note": "云织 Agent 分支加的（10-03），客户端词表没有：claims 是资料汇编里的字段名" }
+      ]
+    },
+    {
+      "id": "state-names",
+      "label": "状态名",
+      "origin": "03§3.5",
+      "boundary": "ascii-word",
+      "flags": "",
+      "terms": [
+        { "t": "planning", "see": "stage-names" },
+        { "re": "gate[123]_(?:awaiting|approved)", "see": "stage-names", "example": "gate2_awaiting", "in_titles": true },
+        { "t": "collecting", "see": "stage-names" },
+        { "t": "outlining", "see": "stage-names" },
+        { "t": "drafting", "see": "stage-names" },
+        { "t": "verifying", "see": "stage-names" },
+        { "t": "delivered", "see": "stage-names" }
+      ]
+    },
+    {
+      "id": "verdict-codes",
+      "label": "判定码",
+      "origin": "03§3.5",
+      "boundary": "ascii-word",
+      "flags": "",
+      "plurals": true,
+      "terms": [
+        { "t": "PASS", "see": "verdict-codes" },
+        { "t": "WARN", "see": "verdict-codes" },
+        { "t": "FAIL", "see": "verdict-codes" }
+      ]
+    },
+    {
+      "id": "ids",
+      "label": "编号",
+      "origin": "03§3.5",
+      "boundary": "ascii-word",
+      "flags": "",
+      "terms": [
+        {
+          "re": "[EHRD]\\d{1,2}",
+          "see": null,
+          "suggest": "不显示编号；假设写「假设一 / 假设二」或「强一点的说法 / 弱一点的说法」，红线和规范直接用一句话说内容",
+          "example": "H1",
+          "note": "半年度（2025 年 H1）和乙醇汽油标号（E10）是经济研究的常用写法，不算；「假设 H1」仍算。2025H1 这种紧挨数字的写法本来就不命中。",
+          "except_re": [
+            { "re": "年度?\\s*H[12](?:\\s*[/、,，;；和与及至到~～–—-]\\s*H[12])*", "example": "2025 年 H1、H2 对比", "note": "半年度，年字在前" },
+            { "re": "(?:(?:19|20)\\d{2}|FY\\s*\\d{2,4})\\s*H[12](?:\\s*[/、,，;；和与及至到~～–—-]\\s*H[12])*", "example": "2025 H1 的出口", "note": "半年度，年份在前" },
+            { "re": "H[12](?:\\s*[/、,，;；和与及至到~～–—-]\\s*H[12])*\\s*(?:of\\s+)?(?:(?:19|20)\\d{2}|FY\\s*\\d{2,4})(?![0-9])", "example": "H1 2025 的出口", "note": "半年度，年份在后" },
+            { "re": "[上下]半年\\s*[(（]?\\s*H[12]", "example": "上半年（H1）", "note": "半年度，中文在前" },
+            { "re": "H[12]\\s*[(（]?\\s*[上下]半年", "example": "H2（下半年）", "note": "半年度，中文在后" },
+            { "re": "E\\d{1,3}(?:\\s*[/、,，和与及-]\\s*E\\d{1,3})*\\s*(?:型\\s*)?(?:车用\\s*)?(?:乙醇|汽油|燃料|燃油|[Ee]thanol|[Ff]uel|[Gg]asoline|[Pp]etrol)", "example": "E10 乙醇汽油", "note": "乙醇汽油标号（E10 / E15 / E85），标号在前" },
+            { "re": "(?:乙醇汽油|汽油|燃料乙醇|燃料|燃油|乙醇)\\s*[(（:：]?\\s*E\\d{1,3}(?:\\s*[/、,，和与及-]\\s*E\\d{1,3})*", "example": "推广乙醇汽油（E10）", "note": "同上，标号在后" }
+          ]
+        },
+        { "re": "\\[\\[R[\\d#]+\\]\\]", "see": "placeholder", "boundary": "none", "example": "[[R012]]", "in_titles": true },
+        { "re": "S\\d{2,3}", "see": null, "suggest": "不显示资料卡片的编号：直接说是哪份资料、什么内容（资料的标题，或者那个数和它的口径）", "example": "S02", "note": "云织 Agent 分支加的（10-03），客户端词表没有：资料卡片的编号 S01、S02……" }
+      ]
+    },
+    {
+      "id": "env-files",
+      "label": "环境 / 文件",
+      "origin": "03§3.5",
+      "boundary": "ascii-word",
+      "flags": "",
+      "terms": [
+        { "t": "py", "see": "environment" },
+        { "t": "pwsh", "see": "environment", "flags": "i" },
+        { "t": "PATH", "see": "environment" },
+        { "t": "127.0.0.1", "see": "environment", "boundary": "none", "in_titles": true },
+        {
+          "re": "\\.(?:py|mjs|ya?ml|md)(?![A-Za-z0-9_])",
+          "see": null,
+          "suggest": "不写文件名：用研究员名称加版本，例如「任务计划第 2 版」",
+          "boundary": "none",
+          "example": "task_plan.md",
+          "in_titles": true
+        },
+        { "t": "<project>", "see": "internal-fields", "boundary": "none", "in_titles": true },
+        { "t": "<toolkit>", "see": "internal-fields", "boundary": "none", "in_titles": true }
+      ]
+    },
+    {
+      "id": "script-names",
+      "label": "脚本名",
+      "origin": "03§3.5",
+      "boundary": "ascii-word",
+      "flags": "",
+      "in_titles": true,
+      "terms": [
+        { "t": "cite_check", "see": "check-names" },
+        { "t": "card_check", "see": "check-names" },
+        { "t": "dossier_check", "see": "check-names" },
+        { "t": "outline_check", "see": "check-names" },
+        { "t": "pipeline_status", "see": "check-names" },
+        { "t": "stamp.py", "see": "check-names" },
+        { "t": "session_facts", "see": "check-names" },
+        { "re": "render_[A-Za-z0-9_]+", "see": "check-names", "example": "render_html" }
+      ]
+    },
+    {
+      "id": "coined-zh",
+      "label": "自造词",
+      "origin": "03§3.5",
+      "boundary": "none",
+      "flags": "",
+      "terms": [
+        { "t": "对接窗口", "see": "signoff-point", "in_titles": true },
+        { "t": "窗口卡", "see": "signoff-card", "in_titles": true },
+        { "t": "窗口报告", "see": "signoff-card", "in_titles": true },
+        { "t": "过窗口", "see": "re-signoff", "in_titles": true },
+        { "t": "正本", "see": "canonical", "except": ["正本清源", "正本与副本", "正本和副本"] },
+        { "t": "落章", "see": "signoff-record", "in_titles": true },
+        { "t": "印章", "see": "signoff-record", "except": ["电子印章", "印章管理", "印章刻制"] },
+        { "t": "盖章", "see": "signoff-record", "except": ["签字盖章", "盖章审批", "审批盖章"] },
+        { "t": "预注册", "see": "preregistration" },
+        { "t": "闸门", "see": "checkpoint" },
+        { "t": "升格", "see": "promote" },
+        { "t": "判断三行", "see": "three-points", "in_titles": true },
+        { "t": "口径承诺", "see": "point-changes", "in_titles": true },
+        { "t": "最脆", "see": "point-weakest", "except": ["最脆弱"], "note": "「最脆弱」（最脆弱群体）是常用语（Selina 9-30）" },
+        { "t": "收轮", "see": "pause-quick-cascade", "in_titles": true },
+        { "t": "秒批", "see": "pause-quick-cascade" },
+        { "t": "重弹", "see": "re-signoff", "in_titles": true },
+        { "t": "重渲", "see": "re-signoff", "in_titles": true },
+        { "t": "预告", "see": "preview" },
+        { "t": "出口契约", "see": "exit-contract" },
+        {
+          "t": "管线",
+          "see": "pipeline",
+          "except": ["地下管线", "综合管线", "管线普查", "管线工程", "燃气管线", "供水管线", "排水管线", "电力管线", "通信管线", "热力管线", "油气管线"],
+          "note": "城市地下管线是真实的政策研究题目"
+        },
+        { "t": "元信息条", "see": "internal-fields", "in_titles": true },
+        { "t": "五态", "see": "fetch-states" },
+        { "t": "招式", "see": "moves" },
+        { "t": "纪律库", "see": "discipline", "in_titles": true },
+        { "t": "子代理", "see": "engine-internals" },
+        { "t": "会话日志", "see": "engine-internals" },
+        { "t": "越界", "see": "outside-reads" },
+        { "t": "证伪", "see": "falsifiable" },
+        {
+          "t": "文体",
+          "see": "genre",
+          "except": ["文体旅", "文体商旅", "文体产业", "文体事业", "文体活动", "文体设施", "文体场馆", "文体中心", "文体局", "文体广电", "文体消费", "文体赛事", "文体娱乐", "文体服务", "文体融合", "文体教"],
+          "note": "「文体」在政策语境里常是「文化体育」的缩写（文体旅融合），那些不算"
+        },
+        { "t": "汇编综合", "see": "dossier", "in_titles": true },
+        { "re": "(?:结论|边界|闸门|索引)层", "see": "dossier-layers", "example": "闸门层", "except": ["大气边界层", "城市边界层", "行星边界层", "海洋边界层", "湍流边界层", "层流边界层", "边界层高度", "边界层理论", "结论层面", "边界层面"], "note": "边界层是大气科学、流体力学的用语，结论层面 / 边界层面是常用语（Selina 9-30）；结论层、边界层、闸门层、索引层单独出现仍算" },
+        { "t": "登记表", "see": "references" },
+        { "t": "渲染", "see": "render" }
+      ]
+    },
+    {
+      "id": "glossary-en",
+      "label": "英文内部词（词表补）",
+      "origin": "glossary",
+      "boundary": "ascii-word",
+      "flags": "i",
+      "plurals": true,
+      "terms": [
+        { "t": "html", "see": "formats" },
+        { "t": "docx", "see": "formats" },
+        { "t": "strong", "see": "strength" },
+        { "t": "medium", "see": "strength" },
+        { "t": "weak", "see": "strength" },
+        { "t": "MED", "see": "strength", "flags": "" },
+        { "t": "failed", "see": "fetch-states", "flags": "" },
+        { "t": "blocked", "see": "fetch-states", "flags": "" },
+        { "t": "empty", "see": "fetch-states", "flags": "" },
+        {
+          "re": "[a-z][a-z0-9]*(?:_[a-z0-9]+)+",
+          "see": null,
+          "flags": "",
+          "suggest": "不写字段名、状态名这类带下划线的内部标识",
+          "example": "rule_trace",
+          "in_titles": true
+        },
+        {
+          "re": "\\{#[A-Za-z0-9_-]+\\}",
+          "see": "internal-fields",
+          "boundary": "none",
+          "example": "{#commitments}",
+          "in_titles": true
+        }
+      ]
+    },
+    {
+      "id": "glossary-zh",
+      "label": "内部中文词（词表补）",
+      "origin": "glossary",
+      "boundary": "none",
+      "flags": "",
+      "terms": [
+        { "t": "双格式", "see": "formats", "in_titles": true },
+        { "t": "级联裁决", "see": "pause-quick-cascade", "in_titles": true },
+        { "t": "承诺三行", "see": "three-points", "in_titles": true },
+        { "t": "降格改准", "see": "severity", "in_titles": true },
+        { "t": "技术破坏", "see": "severity" },
+        { "t": "操作定义", "see": "operational-definition" },
+        { "t": "操作化", "see": "construct" },
+        { "t": "构念", "see": "construct" },
+        { "re": "式[①-⑫]", "see": "moves", "example": "式⑧", "in_titles": true },
+        { "t": "公理", "see": "environment" },
+        { "t": "检查器", "see": "checker" },
+        { "t": "检查脚本", "see": "checker" },
+        { "t": "机器取值", "see": "checker", "in_titles": true },
+        { "t": "全绿", "see": "check-names" },
+        { "t": "容差", "see": "word-counts" },
+        { "t": "步数", "see": "engine-internals" },
+        { "t": "Σ", "see": "word-counts" },
+        {
+          "re": "A[−-]级?",
+          "see": "source-tier",
+          "boundary": "ascii-word",
+          "example": "A−级",
+          "except_re": [
+            { "re": "(?:标普|标准普尔|穆迪|惠誉|中诚信|联合资信|大公国际|东方金诚|S&P|Standard\\s*&\\s*Poor['’]?s|Moody['’]?s|Fitch|信用评级|主体评级|债项评级|信用等级)(?:(?!证据|来源|聚合|强度)[^\\n。；;!?！？,，、]){0,8}?(?<![A-Za-z0-9_])A[−-]级?(?![A-Za-z0-9_])", "example": "惠誉将其评级下调至 A-", "note": "信用评级：评级机构名（标普 / 穆迪 / 惠誉 / 中诚信 / 联合资信 / 大公国际 / 东方金诚，S&P / Moody's / Fitch），或「信用评级 / 主体评级 / 债项评级 / 信用等级」之后 8 个字以内；中间不隔标点，也不夹「证据 / 来源 / 聚合 / 强度」（夹了就是我们自己的分级）。只写「评级」不算：证据评级、来源评级、聚合评级是我们自己的说法。机构名只认全称「大公国际」：「大公」会出现在大公司、大公报、最大公约数里" },
+            { "re": "(?<![A-Za-z0-9_])A[−-]\\s*(?:级\\s*)?(?:的\\s*)?(?:信用评级|主体评级|债项评级|信用等级|[Cc]redit\\s+[Rr]ating)", "example": "该债券获 A- 信用评级", "note": "同上，评级词在后；只写「评级」不算（A− 评级的来源）" },
+            { "re": "(?<![A-Za-z0-9_])A[−-]\\s*[(（]\\s*(?:标普|标准普尔|穆迪|惠誉|中诚信|联合资信|大公国际|东方金诚|S&P|Standard\\s*&\\s*Poor['’]?s|Moody['’]?s|Fitch)", "example": "维持 A-（标普）", "note": "信用评级，机构名在后面的括号里（同样只认「大公国际」）" },
+            { "re": "(?:标普|标准普尔|穆迪|惠誉|中诚信|联合资信|大公国际|东方金诚|S&P|Standard\\s*&\\s*Poor['’]?s|Moody['’]?s|Fitch|信用评级|主体评级|债项评级|信用等级)(?:[\\s:：]+(?![Ee]vidence\\b|[Ss]ources?\\b|[Aa]ggregate\\b|[Ss]trength\\b|[Tt]iers?\\b)[A-Za-z0-9][A-Za-z0-9'’.&-]*){0,3}[\\s:：]+(?<![A-Za-z0-9_])A[−-]级?(?![A-Za-z0-9_])", "example": "Fitch Ratings affirmed A-", "note": "英文按词算距离：机构名或评级词之后 3 个词以内（W3-1）；中文仍按字（上面第一条，8 个字以内）。中间的词不能是 evidence / source / aggregate / strength / tier 这类我们自己分级的说法" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retired-zh",
+      "label": "已改名的旧说法",
+      "origin": "decision",
+      "boundary": "none",
+      "flags": "",
+      "note": "对用户已经换了说法的词（glossary.json 各行的 retired_zh，测试核对两边一致）。",
+      "terms": [
+        { "t": "任务书", "see": "task-plan", "in_titles": true, "note": "Rick 9-29 定：task_plan 对用户叫「任务计划」。《》里也算（Selina 9-30）：真实文献标题里的「任务书」由用户原话核对放行" }
+      ]
+    }
+  ],
+  "soft": [
+    { "id": "caliber-misuse", "re": "项目口径|口径放宽", "see": "caliber", "note": "口径只用统计口径的本义；「项目口径」改「研究范围」，「口径放宽」改「放宽资料要求」" },
+    { "id": "evidence-card", "t": "证据卡", "see": "evidence-card", "note": "界面上可以出现（建议叫资料卡片），成稿里不应出现" },
+    { "id": "budget-money", "t": "预算", "see": "budget", "note": "「预算」只能指钱；篇幅和工作量上限不叫预算" },
+    { "id": "proposition", "re": "命题|论证", "see": null, "note": "能懂，但不建议当标题；「核心判断」更顺口" },
+    { "id": "window", "t": "窗口", "see": "signoff-point", "note": "可以是用户领域里的「时间窗口」「政策窗口期」，所以硬名单只收复合形式" },
+    { "id": "void", "t": "作废", "see": "stale", "note": "日常词；说确认记录时改「需要重新确认」" },
+    { "id": "verdict-word", "t": "裁定", "see": "verdict", "note": "法律语境里是正常词；说结论时改「结论」" },
+    { "id": "distortion-word", "t": "曲解", "see": "distortion", "note": "带有故意的意思；复核时改「改写失真」" },
+    { "id": "node", "t": "节点", "see": "word-counts", "note": "「时间节点」是日常词；说提纲时改「章节」" },
+    { "id": "toolkit-word", "t": "工具包", "see": "internal-fields", "note": "「政策工具包」是政策研究的真实用词" }
+  ]
+}

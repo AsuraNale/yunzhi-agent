@@ -1,0 +1,31 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-006",
+ "question_id": "q-fixture-006",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:task-plan",
+   "question": "Confirm the task plan?",
+   "options": [
+    {
+     "label": "confirm"
+    },
+    {
+     "label": "not_yet"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "task-plan",
+    "call_id": "call-fixture-006",
+    "kind": "task_plan",
+    "approve": "confirm"
+   },
+   "card": {
+    "kind": "task_plan"
+   }
+  }
+ ]
+}

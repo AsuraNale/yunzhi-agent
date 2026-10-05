@@ -1,0 +1,76 @@
+---
+kind: dossier
+version: 1
+updated_at: '2026-09-23T11:00:00-04:00'
+genre: survey
+approval: {status: awaiting, approved_at: null, approved_by: null, approval_quote: null, approved_hash: null}
+dashboard:
+  cards_count: 6
+  steps_used: 41
+  session: "0192c7a1-3d4e-7f00-8000-00000000c1a5"
+  session_picked_by: "DSH_SESSION_ID(harness 注入)"
+  captured_at: "2026-09-23T14:50:00.000Z"
+  budget_ref: task_plan.budget
+claims:
+  - {id: C1, strength: medium, evidence: [S01, S02], rule_trace: "独立来源2·只有政策文本→中", override_reason: null}
+  - {id: C2, strength: medium_strong, evidence: [S03], rule_trace: "一手文件与统计公报·本地数据1·指标不完整→中强", override_reason: null}
+  - {id: C3, strength: medium, evidence: [S04], rule_trace: "一手文件1·房源数不明→中", override_reason: null}
+  - {id: C4, strength: medium, evidence: [S01], rule_trace: "一手文件1·只有标准没有实发→中", override_reason: null}
+  - {id: C5, strength: weak, evidence: [S05], rule_trace: "二手研究·无逐市依据→弱", override_reason: null}
+rules_candidates: [R1, R2, R3, R4, R5]
+gate_verdict: null
+gaps:
+  - {id: G1, what: 补贴实际发放金额, state: gap, owner: null}
+revision_log: []
+---
+
+# 资料汇编
+
+## 定义与口径 {#header}
+
+沿用任务计划第 1 版的操作定义：人才引进政策指市级政府公布的补贴、落户、住房措施；补贴指文件上写明的发放标准。证据等级按 A / A− / B 三级。
+
+## 结论层 {#claims}
+
+- C1 四个市都用补贴吸引人才，但补贴的对象不一样（证据一般，S01、S02）。
+- C2 丙市的落户门槛最低（证据较充分，S03）。
+- C3 丁市以住房为主要手段（证据一般，S04）。
+- C4 甲市的补贴覆盖面最广（证据一般，S01）。
+- C5 四个市的政策都在 2024 年前后调整过（证据不足，S05）。
+
+## 边界层 {#boundaries}
+
+- R1 只比较政策文本，不评价实际效果。
+- R2 补贴金额是文件上的标准，实际发放金额没有公开数据。
+- R3 比较研究报告的结论是二手说法，只作背景。
+- R4 不推到长三角其他城市。
+- R5 政策文本以 2025 年 6 月前公布的为准。
+
+## 内容层 {#content}
+
+| 措施 | 甲市 | 乙市 | 丙市 | 丁市 |
+|---|---|---|---|---|
+| 主要手段 | 按学历分档的补贴 | 高层次人才奖励 | 放宽落户 | 人才公寓 |
+| 资料卡片 | S01 | S02 | S03 | S04 |
+
+## 下一步层 {#next}
+
+- G1 补贴实际发放金额：四个市都没有公布（gap）。
+- 政策选项：可以只比较文件上的标准；要比较效果，需要另外找各市的发放数据。
+
+## 索引层 {#index}
+
+- R001 [《甲市人才安居实施办法（2024 年修订）》（虚构）](https://example.org/yangtze-talent/jia-housing-2024.pdf)
+- R002 [《乙市高层次人才引进若干措施》（虚构）](https://example.org/yangtze-talent/yi-high-level-2024.pdf)
+- R003 [《丙市人才落户实施细则》（虚构）](https://example.org/yangtze-talent/bing-hukou-2024.pdf)
+- R004 [《丁市青年人才住房保障办法》（虚构）](https://example.org/yangtze-talent/ding-apartments-2024.pdf)
+- R005 [《长三角人才政策比较研究（2025）》（虚构）](https://example.org/yangtze-talent/comparative-study-2025.html)
+- R006 [《甲市 2025 年人才工作要点》（虚构）](https://example.org/yangtze-talent/jia-work-points-2025.pdf)
+- R007 [《丙市统计公报 2024》（虚构）](https://example.org/yangtze-talent/bing-bulletin-2024.pdf)
+- R008 [《丁市人才服务中心年报 2024》（虚构）](https://example.org/yangtze-talent/ding-service-centre-2024.pdf)
+
+## 要你认的三件事 {#commitments}
+
+1. **改动内容**：这是第 1 版。
+2. **最薄弱的依据**：比较研究报告是二手资料，只当背景。
+3. **最可能出错的地方**：写作时把「四市各有侧重」写成「哪个市的政策更好」。我只比较政策文本，不评价效果。

@@ -1,0 +1,37 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-001",
+ "question_id": "q-fixture-001",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:talent-report-type",
+   "question": "Choose the report type.",
+   "options": [
+    {
+     "label": "judge"
+    },
+    {
+     "label": "survey"
+    },
+    {
+     "label": "undecided"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "talent-report-type",
+    "call_id": "call-fixture-001",
+    "kind": "report_type"
+   },
+   "card": {
+    "kind": "report_type",
+    "report_name": "材料",
+    "thesis": "长三角四市的人才引进政策在补贴、落户、住房上各有侧重",
+    "why": "你说「不用下结论」，所以先问清楚：这份材料是梳理情况，还是要对这件事下一个判断。",
+    "recommend": "survey"
+   }
+  }
+ ]
+}

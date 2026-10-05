@@ -1,0 +1,290 @@
+kind: references
+version: 18
+updated_at: '2026-10-02T14:30:00-04:00'
+entries:
+  - id: R001
+    title: '《H 省能源发展年度报告 2025》（虚构）'
+    url: 'https://example.org/h-province/energy-report-2025.pdf'
+    tier: A
+    as_of: '2025-06-30'
+    locator: '第 4 章表 4-3'
+    card: S01
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R002
+    title: '《H 省三地市县域充电设施建设通报（2025）》（虚构）'
+    url: 'https://example.org/h-province/county-charging-notice-2025.pdf'
+    tier: A-
+    as_of: '2025-03-31'
+    locator: '附表 2'
+    card: S02
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R003
+    title: '《H 省三地市县域充电设施建设通报（2025）附表》（虚构）'
+    url: 'https://example.org/h-province/county-charging-notice-2025-annex.pdf'
+    tier: A-
+    as_of: '2025-03-31'
+    locator: '附表 3'
+    card: S03
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R004
+    title: '《H 省新能源汽车下乡活动总结（2024）》（虚构）'
+    url: 'https://example.org/h-province/nev-countryside-summary-2024.pdf'
+    tier: A
+    as_of: '2025-01-20'
+    locator: '第二部分'
+    card: S04
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R005
+    title: '《H 省能源发展年度报告 2025》第 4 章（虚构）'
+    url: 'https://example.org/h-province/energy-report-2025-ch4.pdf'
+    tier: A
+    as_of: '2025-06-30'
+    locator: '第 4 章第三节'
+    card: S05
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R006
+    title: '《关于支持新能源汽车下乡配套充电设施建设的通知》（虚构）'
+    url: 'https://example.org/h-province/subsidy-notice-2023.pdf'
+    tier: A
+    as_of: '2023-03-01'
+    locator: '第三条'
+    card: S06
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R007
+    title: '《H 省充电设施运行监测季报（2024 年第四季度）》（虚构）'
+    url: 'https://example.org/h-province/charging-monitor-2024q4.pdf'
+    tier: A-
+    as_of: '2025-02-15'
+    locator: '表 5'
+    card: S07
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R008
+    title: '《H 省县域充电设施建设通报汇总表》（虚构）'
+    url: 'https://example.org/h-province/county-charging-summary.xlsx'
+    tier: A-
+    as_of: '2025-03-31'
+    locator: '附表 1'
+    card: S08
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R009
+    title: '《H 省新能源汽车下乡活动总结（2024）》第三部分（虚构）'
+    url: 'https://example.org/h-province/nev-countryside-summary-2024-part3.pdf'
+    tier: A
+    as_of: '2025-01-20'
+    locator: '第三部分'
+    card: S09
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R010
+    title: '《H 省农村电网巩固提升工程进展情况》（虚构）'
+    url: 'https://example.org/h-province/rural-grid-progress-2024.pdf'
+    tier: A
+    as_of: '2025-01-10'
+    locator: '第二部分'
+    card: S10
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R011
+    title: '《H 省交通运输发展统计公报 2024》（虚构）'
+    url: 'https://example.org/h-province/transport-bulletin-2024.pdf'
+    tier: A
+    as_of: '2025-04-08'
+    locator: '第五部分'
+    card: S11
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R012
+    title: '《H 省三地市县域充电设施建设通报（2025）》附表注（虚构）'
+    url: 'https://example.org/h-province/county-charging-notice-2025-notes.pdf'
+    tier: A-
+    as_of: '2025-03-31'
+    locator: '附表 2 注'
+    card: S12
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R013
+    title: '《H 省充电设施运行监测季报（2024 年第四季度）》表 7（虚构）'
+    url: 'https://example.org/h-province/charging-monitor-2024q4-t7.pdf'
+    tier: A-
+    as_of: '2025-02-15'
+    locator: '表 7'
+    card: S13
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R014
+    title: '《关于公布新能源汽车下乡活动参加县名单的通知》（虚构）'
+    url: 'https://example.org/h-province/county-list-2024.pdf'
+    tier: A
+    as_of: '2024-05-20'
+    locator: '附件'
+    card: S14
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R015
+    title: '某车企 2024 年县域市场新闻稿（虚构）'
+    url: 'https://example.org/h-province/carmaker-press-2024.html'
+    tier: B
+    as_of: '2025-01-15'
+    locator: '第二段'
+    card: S15
+    claims_source: '企业自报，未见第三方核实'
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R016
+    title: '《H 省县域充电设施建设规划（2021—2025）》（虚构）'
+    url: 'https://example.org/h-province/county-charging-plan-2021.pdf'
+    tier: A
+    as_of: '2021-08-01'
+    locator: '第二章'
+    card: S16
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R017
+    title: '《A 市统计公报 2024》（虚构）'
+    url: 'https://example.org/h-province/a-city-bulletin-2024.pdf'
+    tier: A
+    as_of: '2025-03-15'
+    locator: '表 9'
+    card: S01
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R018
+    title: '《B 市县域充电设施建设专报》（虚构）'
+    url: 'https://example.org/h-province/b-city-charging-brief.pdf'
+    tier: A-
+    as_of: '2025-02-28'
+    locator: '第二页'
+    card: S02
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R019
+    title: '《C 市乡镇充电站建设情况》（虚构）'
+    url: 'https://example.org/h-province/c-city-township-stations.html'
+    tier: A-
+    as_of: '2024-11-30'
+    locator: '第一部分'
+    card: S03
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R020
+    title: '《H 省新能源汽车推广应用年报 2024》（虚构）'
+    url: 'https://example.org/h-province/nev-annual-2024.pdf'
+    tier: A
+    as_of: '2025-04-30'
+    locator: '第三章'
+    card: S04
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R021
+    title: '《A 市交通运输局 2024 年工作总结》（虚构）'
+    url: 'https://example.org/h-province/a-city-transport-2024.pdf'
+    tier: A-
+    as_of: '2025-01-31'
+    locator: '第四部分'
+    card: S05
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R022
+    title: '《H 省财政厅 2023 年专项资金下达通知》（虚构）'
+    url: 'https://example.org/h-province/special-funds-2023.pdf'
+    tier: A
+    as_of: '2023-06-15'
+    locator: '附件'
+    card: S06
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R023
+    title: '《H 省充电设施运行监测季报（2022 年第四季度）》（虚构）'
+    url: 'https://example.org/h-province/charging-monitor-2022q4.pdf'
+    tier: A-
+    as_of: '2023-02-15'
+    locator: '表 5'
+    card: S07
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R024
+    title: '《H 省县域充电设施建设现场会材料》（虚构）'
+    url: 'https://example.org/h-province/county-charging-meeting-2024.html'
+    tier: B
+    as_of: '2024-09-20'
+    locator: '第二部分'
+    card: S08
+    claims_source: '会议材料，转引自地市汇报'
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R025
+    title: '《H 省县级政府绩效考核指标说明（2023）》（虚构）'
+    url: 'https://example.org/h-province/county-assessment-2023.pdf'
+    tier: A
+    as_of: '2023-04-10'
+    locator: '第十条'
+    card: S09
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []
+  - id: R026
+    title: '《H 省充电设施运行监测季报（2025 年第三季度）》（虚构）'
+    url: 'https://example.org/h-province/charging-monitor-2025q3.pdf'
+    tier: A-
+    as_of: '2025-10-20'
+    locator: '表 2'
+    card: S08
+    claims_source: null
+    unverified: false
+    liveness: null
+    used_by: []

@@ -1,0 +1,43 @@
+/* classic —— 保留 v1 渲染器的观感:宋体、暖纸底、褐色标题线。
+   用途:向后兼容。既有交付物想保持原样重渲时用 --theme classic。
+   ⚠️ v1 只有 9 行 CSS,没有暗色模式;本主题补齐了暗色,其余尽量贴近原观感。 */
+
+:root{
+  --doc-ground:#fdfdfa; --doc-surface:#fffef9; --doc-sunk:#f4f1e8;
+  --doc-ink:#222222; --doc-ink-2:#444444; --doc-ink-3:#777777;
+  --doc-line:#e0d8c8; --doc-line-2:#ebe5d9;
+  --doc-accent:#8a6d3b; --doc-accent-soft:#f2ebdd; --doc-accent-deep:#5a4a2f;
+  --doc-pos:#4a6b3a; --doc-pos-soft:#eaf0e4;
+  --doc-warn:#8a6d3b; --doc-warn-soft:#f5eddc;
+  --doc-neg:#8c3a2f; --doc-neg-soft:#f5e5e1;
+  --doc-mono:Consolas,"Cascadia Code",ui-monospace,monospace;
+  --doc-sans:"Source Han Serif SC","Noto Serif CJK SC","Songti SC","SimSun",Georgia,serif;
+  --doc-measure:46em;
+  --doc-width:52em;
+}
+/* v1 的观感细节:h1 下方褐色粗线、正文更松的行距 */
+body{line-height:1.85}
+.doc-masthead{border-bottom:2px solid var(--doc-accent)}
+.doc h2,.doc h3{color:var(--doc-accent-deep)}
+.doc-secnum{border-color:var(--doc-accent);color:var(--doc-accent)}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --doc-ground:#17150f; --doc-surface:#1e1b14; --doc-sunk:#26221a;
+    --doc-ink:#eae4d6; --doc-ink-2:#b8b0a0; --doc-ink-3:#8a8274;
+    --doc-line:#3a3428; --doc-line-2:#2c281f;
+    --doc-accent:#d4a862; --doc-accent-soft:#3a2f1a; --doc-accent-deep:#e8c98d;
+    --doc-pos:#8fbf76; --doc-pos-soft:#1f2e18;
+    --doc-warn:#d4a862; --doc-warn-soft:#3a2f1a;
+    --doc-neg:#e08a78; --doc-neg-soft:#3a201a;
+  }
+}
+:root[data-theme="dark"]{
+  --doc-ground:#17150f; --doc-surface:#1e1b14; --doc-sunk:#26221a;
+  --doc-ink:#eae4d6; --doc-ink-2:#b8b0a0; --doc-ink-3:#8a8274;
+  --doc-line:#3a3428; --doc-line-2:#2c281f;
+  --doc-accent:#d4a862; --doc-accent-soft:#3a2f1a; --doc-accent-deep:#e8c98d;
+  --doc-pos:#8fbf76; --doc-pos-soft:#1f2e18;
+  --doc-warn:#d4a862; --doc-warn-soft:#3a2f1a;
+  --doc-neg:#e08a78; --doc-neg-soft:#3a201a;
+}

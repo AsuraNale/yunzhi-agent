@@ -1,0 +1,144 @@
+/* base.css —— 骨架层。所有主题共用,只管结构与可访问性,不管观感。
+   主题只需覆盖下面 :root 里的 token(或按需覆盖布局)。
+   ⚠️ 改这里 = 改所有成品的结构行为,慎。 */
+
+:root{
+  /* 主题必须覆盖的 token(这里给的是无主题时的安全默认值) */
+  --doc-ground:#ffffff; --doc-surface:#ffffff; --doc-sunk:#f2f2f2;
+  --doc-ink:#1a1a1a; --doc-ink-2:#4a4a4a; --doc-ink-3:#767676;
+  --doc-line:#dcdcdc; --doc-line-2:#ececec;
+  --doc-accent:#33607a; --doc-accent-soft:#e6eef3; --doc-accent-deep:#24485c;
+  --doc-pos:#1a7a4a; --doc-pos-soft:#e6f2ec;
+  --doc-warn:#8a6114; --doc-warn-soft:#f6efdf;
+  --doc-neg:#a03030; --doc-neg-soft:#f7e9e8;
+  --doc-mono:ui-monospace,Consolas,monospace;
+  --doc-sans:system-ui,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  --doc-measure:41em;   /* 正文行宽 */
+  --doc-width:1080px;   /* 页面最大宽 */
+}
+
+*{box-sizing:border-box}
+body{background:var(--doc-ground);color:var(--doc-ink);font-family:var(--doc-sans);
+  line-height:1.78;margin:0;padding:0;font-size:16px;-webkit-font-smoothing:antialiased}
+.doc{max-width:var(--doc-width);margin:0 auto;padding:0 24px 90px}
+.doc-narrow{max-width:var(--doc-measure)}
+.doc-mono{font-family:var(--doc-mono);font-variant-numeric:tabular-nums}
+
+/* 报头 */
+.doc-masthead{padding:52px 0 22px;border-bottom:2px solid var(--doc-ink)}
+.doc-eyebrow{font-family:var(--doc-mono);font-size:.72rem;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--doc-accent);font-weight:600}
+.doc-masthead h1{font-size:2.15rem;line-height:1.22;margin:12px 0 10px;
+  letter-spacing:-.015em;text-wrap:balance;font-weight:600}
+.doc-sub{color:var(--doc-ink-2);font-size:.96rem;max-width:44em}
+
+/* 元信息条 —— 全部由渲染器机器取值,不接受手写 */
+.doc-meta{display:flex;flex-wrap:wrap;gap:0;margin-top:22px;border:1px solid var(--doc-line);
+  border-radius:3px;background:var(--doc-surface);overflow:hidden}
+.doc-meta>div{padding:10px 16px;border-right:1px solid var(--doc-line);flex:1 1 auto;min-width:110px}
+.doc-meta>div:last-child{border-right:none}
+.doc-meta .k{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--doc-ink-3);font-family:var(--doc-mono)}
+.doc-meta .v{font-family:var(--doc-mono);font-variant-numeric:tabular-nums;
+  font-size:1.02rem;font-weight:600;margin-top:2px}
+
+/* 章节导航 */
+.doc-toc{position:sticky;top:0;z-index:20;background:var(--doc-ground);
+  border-bottom:1px solid var(--doc-line);padding:9px 0;margin-bottom:30px;
+  display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.doc-toc::-webkit-scrollbar{display:none}
+.doc-toc a{display:flex;align-items:baseline;gap:6px;white-space:nowrap;text-decoration:none;
+  color:var(--doc-ink-2);font-size:.84rem;padding:5px 11px;border-radius:3px}
+.doc-toc a:hover{background:var(--doc-sunk);color:var(--doc-ink)}
+.doc-toc .n{font-family:var(--doc-mono);font-size:.74rem;color:var(--doc-accent);font-weight:600}
+
+/* 前提声明(正文第一个引用块) */
+.doc-premise{background:var(--doc-surface);border:1px solid var(--doc-line);
+  border-left:3px solid var(--doc-accent);border-radius:3px;padding:16px 20px;
+  font-size:.93rem;color:var(--doc-ink-2);margin-bottom:30px}
+
+/* 正文 */
+.doc-sec{margin:0 0 46px}
+.doc h2{font-size:1.42rem;margin:44px 0 16px;line-height:1.32;font-weight:600;
+  display:flex;align-items:baseline;gap:12px;text-wrap:balance;
+  padding-bottom:9px;border-bottom:1px solid var(--doc-line)}
+.doc-secnum{font-family:var(--doc-mono);font-size:.9rem;color:var(--doc-accent);
+  font-weight:600;border:1px solid var(--doc-accent);border-radius:2px;padding:1px 7px;flex:none}
+.doc h3{font-size:1.06rem;margin:30px 0 10px;font-weight:600;color:var(--doc-accent-deep)}
+.doc h4{font-size:.98rem;margin:22px 0 8px;font-weight:600;color:var(--doc-ink-2)}
+.doc p{margin:0 0 15px;max-width:var(--doc-measure)}
+.doc ul,.doc ol{margin:0 0 16px;padding-left:1.5em;max-width:var(--doc-measure)}
+.doc li{margin:6px 0}
+.doc code{font-family:var(--doc-mono);font-size:.9em;background:var(--doc-sunk);
+  padding:1px 5px;border-radius:2px}
+
+/* 文内引用 —— 锚点回跳。⚠️ 用 # 锚点是有意的:cite_check 的 html_links() 只收 http(s) 外链,
+   参考列表条目仍直链来源 URL,故外链集合不变(④ 跨格式相等不受影响)。 */
+sup.doc-cite{font-family:var(--doc-mono);font-size:.66em;vertical-align:super;line-height:0}
+sup.doc-cite a{color:var(--doc-accent);text-decoration:none;font-weight:600;padding:0 1px}
+sup.doc-cite a:hover{text-decoration:underline}
+
+/* 表格 —— 允许超出正文宽度,独立横向滚动,页面本身永不横向滚 */
+.doc-table-wrap{overflow-x:auto;margin:0 0 22px;border:1px solid var(--doc-line);
+  border-radius:3px;background:var(--doc-surface)}
+.doc table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:min(100%,560px)}
+.doc th,.doc td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--doc-line-2);
+  vertical-align:top}
+.doc thead th{background:var(--doc-sunk);font-size:.72rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--doc-ink-3);font-family:var(--doc-mono);
+  font-weight:600;white-space:nowrap;border-bottom:1px solid var(--doc-line)}
+.doc tbody tr:last-child td{border-bottom:none}
+.doc td{font-variant-numeric:tabular-nums}
+/* 语义色列(表头写「绿灯/黄灯/红灯」时自动上色) */
+.doc-lt-pos{background:var(--doc-pos-soft)} .doc thead th.doc-lt-pos{color:var(--doc-pos)}
+.doc-lt-warn{background:var(--doc-warn-soft)} .doc thead th.doc-lt-warn{color:var(--doc-warn)}
+.doc-lt-neg{background:var(--doc-neg-soft)} .doc thead th.doc-lt-neg{color:var(--doc-neg)}
+
+/* 行动卡(加粗标题 + 冒号 + ①②③ 序列的段落) */
+.doc-action{background:var(--doc-accent-soft);border:1px solid var(--doc-accent);
+  border-radius:3px;padding:14px 18px;margin:22px 0 30px;max-width:var(--doc-measure)}
+.doc-action-h{font-family:var(--doc-mono);font-size:.72rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--doc-accent-deep);font-weight:600;margin-bottom:7px}
+.doc-action ol{margin:0;padding-left:1.3em}
+.doc-action li{margin:5px 0;font-size:.92rem}
+
+.doc-colophon{font-size:.86rem;color:var(--doc-ink-3);border-top:1px solid var(--doc-line);
+  padding-top:18px;margin-top:34px;max-width:none}
+
+/* 来源登记表 */
+.doc-refs{margin-top:56px;padding-top:26px;border-top:2px solid var(--doc-ink)}
+.doc-refs h2{border:none;margin-top:0}
+.doc-ref-list{list-style:none;padding:0;margin:0;display:grid;gap:2px;max-width:none}
+.doc-ref-list li{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:11px 12px;
+  border-radius:3px;background:var(--doc-surface);border:1px solid var(--doc-line-2);margin:0}
+.doc-ref-list li:target{border-color:var(--doc-accent);background:var(--doc-accent-soft)}
+.doc-ref-no{font-family:var(--doc-mono);font-size:.82rem;color:var(--doc-accent);
+  font-weight:600;text-align:right;padding-top:1px}
+.doc-ref-t{font-size:.92rem;line-height:1.5}
+.doc-ref-t a{color:var(--doc-ink);text-decoration:none;border-bottom:1px solid var(--doc-accent)}
+.doc-ref-t a:hover{color:var(--doc-accent)}
+.doc-ref-m{font-size:.8rem;color:var(--doc-ink-3);margin-top:3px;line-height:1.55}
+.doc-tier{font-family:var(--doc-mono);font-size:.68rem;font-weight:600;padding:1px 6px;
+  border-radius:2px;background:var(--doc-sunk);color:var(--doc-ink-2);white-space:nowrap}
+.doc-tier-A{background:var(--doc-pos-soft);color:var(--doc-pos)}
+.doc-tier-Am{background:var(--doc-accent-soft);color:var(--doc-accent-deep)}
+.doc-tier-B{background:var(--doc-warn-soft);color:var(--doc-warn)}
+.doc-flag{font-family:var(--doc-mono);font-size:.68rem;padding:1px 6px;border-radius:2px;
+  background:var(--doc-sunk);color:var(--doc-ink-3);white-space:nowrap}
+.doc-flag-warn{background:var(--doc-warn-soft);color:var(--doc-warn)}
+.doc-foot{font-size:.85rem;color:var(--doc-ink-3);margin-top:20px;max-width:none}
+
+a:focus-visible,.doc-toc a:focus-visible{outline:2px solid var(--doc-accent);outline-offset:2px}
+
+@media (max-width:720px){
+  .doc{padding:0 16px 60px}
+  .doc-masthead h1{font-size:1.7rem}
+  .doc-meta>div{min-width:50%}
+  .doc h2{font-size:1.24rem}
+}
+@media print{
+  .doc-toc{display:none}
+  body{background:#fff}
+  .doc-action,.doc-table-wrap,.doc-ref-list li{break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

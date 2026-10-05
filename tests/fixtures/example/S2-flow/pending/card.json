@@ -1,0 +1,159 @@
+{
+ "schema": "yunzhi.card/1",
+ "card_id": "card-00000000-0000-4000-8000-000000000012",
+ "project_id": "proj-68ca27a97d9c4bad",
+ "kind": "flow_change",
+ "gate_id": "flow-change",
+ "question_id": "q-fixture-012",
+ "item_id": "ann-gate:flow-change",
+ "call_id": "call-fixture-012",
+ "shown_at": "2026-10-01T17:25:00-04:00",
+ "attempt": 1,
+ "title": [
+  {
+   "type": "fixed",
+   "text": "重新确认 · 任务计划（只改了流程）"
+  }
+ ],
+ "badge": [
+  {
+   "type": "fixed",
+   "text": "等你决定"
+  }
+ ],
+ "question": [
+  {
+   "type": "fixed",
+   "text": "任务计划"
+  },
+  {
+   "type": "counted",
+   "text": "第 3 版",
+   "source": "task_plan.md · version"
+  },
+  {
+   "type": "fixed",
+   "text": "可以定下来吗？"
+  }
+ ],
+ "blocks": [
+  {
+   "key": "changes",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "改动环节："
+    }
+   ],
+   "text": [
+    {
+     "type": "agent",
+     "field": "changes",
+     "cap": 60,
+     "text": "去掉「拟定提纲」这一步，写作按资料汇编的结构走。"
+    },
+    {
+     "type": "fixed",
+     "text": "判断、范围、口径都没动。"
+    }
+   ]
+  },
+  {
+   "key": "steps",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "改完之后的步骤"
+    }
+   ],
+   "text": [
+    {
+     "type": "counted",
+     "text": "明确任务 → 收集资料 → 撰写交付",
+     "source": "task_plan.md · stages"
+    }
+   ]
+  }
+ ],
+ "options": [
+  {
+   "key": "confirm",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "确认"
+    }
+   ],
+   "description": [
+    {
+     "type": "fixed",
+     "text": "以后按这个流程走。"
+    }
+   ],
+   "primary": true
+  },
+  {
+   "key": "not_yet",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "先不确认"
+    }
+   ],
+   "description": [
+    {
+     "type": "fixed",
+     "text": "还按原来的流程走。"
+    }
+   ],
+   "primary": false
+  }
+ ],
+ "note": {
+  "label": [
+   {
+    "type": "fixed",
+    "text": "你的意见（可选）"
+   }
+  ],
+  "placeholder": [
+   {
+    "type": "fixed",
+    "text": "也可以直接写你的意见……"
+   }
+  ]
+ },
+ "footer": [
+  {
+   "type": "fixed",
+   "text": "你点「确认」后，由云织写下确认记录。"
+  }
+ ],
+ "data": {
+  "doc": "task_plan.md",
+  "version": 3,
+  "previous_version": 2,
+  "stages_before": [
+   "task",
+   "sources",
+   "outline",
+   "delivery"
+  ],
+  "stages_after": [
+   "task",
+   "sources",
+   "delivery"
+  ],
+  "previous_archive": "5d0bc4e1483b71e018add4662f28bb887188c7fb521538b0c1369c3acc9a04a6"
+ },
+ "materials": [
+  {
+   "key": "doc",
+   "doc": "task_plan.md",
+   "version": 3,
+   "content_hash": "8c3a0cdfbc0e",
+   "sha256": "cbe108cd8fbd30b83ab73d9d02002f4fea161134e11c967ae8c9fd92b2e4cfac"
+  }
+ ],
+ "replaced": []
+}

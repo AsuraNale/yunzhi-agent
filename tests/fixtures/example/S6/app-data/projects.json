@@ -1,0 +1,57 @@
+{
+ "schema": "yunzhi.projects/1",
+ "projects": [
+  {
+   "id": "proj-51cce1cabd0e3539",
+   "title": "长三角人才引进政策梳理",
+   "path": "C:\\workspace\\yunzhi-agent\\tests\\fixtures\\example\\S6\\projects\\长三角人才引进政策梳理",
+   "created_at": "2026-09-21T10:05:00-04:00",
+   "request_file": "inputs/request.md",
+   "request_text": "把长三角几个城市这两年的人才引进政策梳理一下，看看补贴、落户、住房这几块各有什么不同。要一份三千字左右的材料，Word 版。",
+   "materials": []
+  },
+  {
+   "id": "proj-60406b5c4ac62769",
+   "title": "县级财政压力与基层公共服务",
+   "path": "C:\\workspace\\yunzhi-agent\\tests\\fixtures\\example\\S6\\projects\\县级财政压力与基层公共服务",
+   "created_at": "2026-09-29T15:20:00-04:00",
+   "request_file": "inputs/request.md",
+   "request_text": "想看看县级财政越来越紧，对乡镇的教育、医疗这些基层公共服务有什么影响。先把情况梳理清楚，不急着下结论。",
+   "materials": []
+  },
+  {
+   "id": "proj-68ca27a97d9c4bad",
+   "title": "新能源汽车下乡与县域充电设施",
+   "path": "C:\\workspace\\yunzhi-agent\\tests\\fixtures\\example\\S6\\projects\\新能源汽车下乡与县域充电设施",
+   "created_at": "2026-09-30T09:58:00-04:00",
+   "request_file": "inputs/request.md",
+   "request_text": "想弄清楚这几年的新能源汽车下乡活动，到底有没有带动县里的公共充电桩建设。要一份给厅里的内参，八千字左右，最后要有政策建议。",
+   "materials": [
+    {
+     "name": "2023县域充电调研（旧稿）.docx",
+     "stored": "inputs/originals/2023县域充电调研（旧稿）.docx",
+     "kind": "docx",
+     "state": "ok",
+     "outputs": [
+      "inputs/converted/2023县域充电调研（旧稿）.docx.md"
+     ],
+     "note": "已转成可读的文字",
+     "detail": "正文 126 字符 · 5 段\r\n→ C:\\workspace\\yunzhi-agent\\tests\\fixtures\\example\\S6\\projects\\新能源汽车下乡与县域充电设施\\inputs\\converted\\2023县域充电调研（旧稿）.docx.md\r\n",
+     "added_at": "2026-09-30T09:58:00-04:00"
+    },
+    {
+     "name": "H省充电设施统计表.xlsx",
+     "stored": "inputs/originals/H省充电设施统计表.xlsx",
+     "kind": "xlsx",
+     "state": "ok",
+     "outputs": [
+      "inputs/converted/H省充电设施统计表.xlsx.sheet1.csv"
+     ],
+     "note": "已转成可读的文字",
+     "detail": "[sheet 1] 4 行 × 3 列\r\n  年份 | 县域公共桩（万台） | 说明\r\n  2022 | 1.1 | 数据为虚构，仅供测试\r\n  2023 | 1.6 | \r\n  2024 | 2.3 | \r\n→ C:\\workspace\\yunzhi-agent\\tests\\fixtures\\example\\S6\\projects\\新能源汽车下乡与县域充电设施\\inputs\\converted\\H省充电设施统计表.xlsx.sheet1.csv\r\n",
+     "added_at": "2026-09-30T09:58:00-04:00"
+    }
+   ]
+  }
+ ]
+}

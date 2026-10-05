@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新能源汽车下乡与县域充电设施</title>
+<style>
+/* base.css */
+/* base.css —— 骨架层。所有主题共用,只管结构与可访问性,不管观感。
+   主题只需覆盖下面 :root 里的 token(或按需覆盖布局)。
+   ⚠️ 改这里 = 改所有成品的结构行为,慎。 */
+
+:root{
+  /* 主题必须覆盖的 token(这里给的是无主题时的安全默认值) */
+  --doc-ground:#ffffff; --doc-surface:#ffffff; --doc-sunk:#f2f2f2;
+  --doc-ink:#1a1a1a; --doc-ink-2:#4a4a4a; --doc-ink-3:#767676;
+  --doc-line:#dcdcdc; --doc-line-2:#ececec;
+  --doc-accent:#33607a; --doc-accent-soft:#e6eef3; --doc-accent-deep:#24485c;
+  --doc-pos:#1a7a4a; --doc-pos-soft:#e6f2ec;
+  --doc-warn:#8a6114; --doc-warn-soft:#f6efdf;
+  --doc-neg:#a03030; --doc-neg-soft:#f7e9e8;
+  --doc-mono:ui-monospace,Consolas,monospace;
+  --doc-sans:system-ui,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  --doc-measure:41em;   /* 正文行宽 */
+  --doc-width:1080px;   /* 页面最大宽 */
+}
+
+*{box-sizing:border-box}
+body{background:var(--doc-ground);color:var(--doc-ink);font-family:var(--doc-sans);
+  line-height:1.78;margin:0;padding:0;font-size:16px;-webkit-font-smoothing:antialiased}
+.doc{max-width:var(--doc-width);margin:0 auto;padding:0 24px 90px}
+.doc-narrow{max-width:var(--doc-measure)}
+.doc-mono{font-family:var(--doc-mono);font-variant-numeric:tabular-nums}
+
+/* 报头 */
+.doc-masthead{padding:52px 0 22px;border-bottom:2px solid var(--doc-ink)}
+.doc-eyebrow{font-family:var(--doc-mono);font-size:.72rem;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--doc-accent);font-weight:600}
+.doc-masthead h1{font-size:2.15rem;line-height:1.22;margin:12px 0 10px;
+  letter-spacing:-.015em;text-wrap:balance;font-weight:600}
+.doc-sub{color:var(--doc-ink-2);font-size:.96rem;max-width:44em}
+
+/* 元信息条 —— 全部由渲染器机器取值,不接受手写 */
+.doc-meta{display:flex;flex-wrap:wrap;gap:0;margin-top:22px;border:1px solid var(--doc-line);
+  border-radius:3px;background:var(--doc-surface);overflow:hidden}
+.doc-meta>div{padding:10px 16px;border-right:1px solid var(--doc-line);flex:1 1 auto;min-width:110px}
+.doc-meta>div:last-child{border-right:none}
+.doc-meta .k{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--doc-ink-3);font-family:var(--doc-mono)}
+.doc-meta .v{font-family:var(--doc-mono);font-variant-numeric:tabular-nums;
+  font-size:1.02rem;font-weight:600;margin-top:2px}
+
+/* 章节导航 */
+.doc-toc{position:sticky;top:0;z-index:20;background:var(--doc-ground);
+  border-bottom:1px solid var(--doc-line);padding:9px 0;margin-bottom:30px;
+  display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.doc-toc::-webkit-scrollbar{display:none}
+.doc-toc a{display:flex;align-items:baseline;gap:6px;white-space:nowrap;text-decoration:none;
+  color:var(--doc-ink-2);font-size:.84rem;padding:5px 11px;border-radius:3px}
+.doc-toc a:hover{background:var(--doc-sunk);color:var(--doc-ink)}
+.doc-toc .n{font-family:var(--doc-mono);font-size:.74rem;color:var(--doc-accent);font-weight:600}
+
+/* 前提声明(正文第一个引用块) */
+.doc-premise{background:var(--doc-surface);border:1px solid var(--doc-line);
+  border-left:3px solid var(--doc-accent);border-radius:3px;padding:16px 20px;
+  font-size:.93rem;color:var(--doc-ink-2);margin-bottom:30px}
+
+/* 正文 */
+.doc-sec{margin:0 0 46px}
+.doc h2{font-size:1.42rem;margin:44px 0 16px;line-height:1.32;font-weight:600;
+  display:flex;align-items:baseline;gap:12px;text-wrap:balance;
+  padding-bottom:9px;border-bottom:1px solid var(--doc-line)}
+.doc-secnum{font-family:var(--doc-mono);font-size:.9rem;color:var(--doc-accent);
+  font-weight:600;border:1px solid var(--doc-accent);border-radius:2px;padding:1px 7px;flex:none}
+.doc h3{font-size:1.06rem;margin:30px 0 10px;font-weight:600;color:var(--doc-accent-deep)}
+.doc h4{font-size:.98rem;margin:22px 0 8px;font-weight:600;color:var(--doc-ink-2)}
+.doc p{margin:0 0 15px;max-width:var(--doc-measure)}
+.doc ul,.doc ol{margin:0 0 16px;padding-left:1.5em;max-width:var(--doc-measure)}
+.doc li{margin:6px 0}
+.doc code{font-family:var(--doc-mono);font-size:.9em;background:var(--doc-sunk);
+  padding:1px 5px;border-radius:2px}
+
+/* 文内引用 —— 锚点回跳。⚠️ 用 # 锚点是有意的:cite_check 的 html_links() 只收 http(s) 外链,
+   参考列表条目仍直链来源 URL,故外链集合不变(④ 跨格式相等不受影响)。 */
+sup.doc-cite{font-family:var(--doc-mono);font-size:.66em;vertical-align:super;line-height:0}
+sup.doc-cite a{color:var(--doc-accent);text-decoration:none;font-weight:600;padding:0 1px}
+sup.doc-cite a:hover{text-decoration:underline}
+
+/* 表格 —— 允许超出正文宽度,独立横向滚动,页面本身永不横向滚 */
+.doc-table-wrap{overflow-x:auto;margin:0 0 22px;border:1px solid var(--doc-line);
+  border-radius:3px;background:var(--doc-surface)}
+.doc table{width:100%;border-collapse:collapse;font-size:.88rem;min-width:min(100%,560px)}
+.doc th,.doc td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--doc-line-2);
+  vertical-align:top}
+.doc thead th{background:var(--doc-sunk);font-size:.72rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--doc-ink-3);font-family:var(--doc-mono);
+  font-weight:600;white-space:nowrap;border-bottom:1px solid var(--doc-line)}
+.doc tbody tr:last-child td{border-bottom:none}
+.doc td{font-variant-numeric:tabular-nums}
+/* 语义色列(表头写「绿灯/黄灯/红灯」时自动上色) */
+.doc-lt-pos{background:var(--doc-pos-soft)} .doc thead th.doc-lt-pos{color:var(--doc-pos)}
+.doc-lt-warn{background:var(--doc-warn-soft)} .doc thead th.doc-lt-warn{color:var(--doc-warn)}
+.doc-lt-neg{background:var(--doc-neg-soft)} .doc thead th.doc-lt-neg{color:var(--doc-neg)}
+
+/* 行动卡(加粗标题 + 冒号 + ①②③ 序列的段落) */
+.doc-action{background:var(--doc-accent-soft);border:1px solid var(--doc-accent);
+  border-radius:3px;padding:14px 18px;margin:22px 0 30px;max-width:var(--doc-measure)}
+.doc-action-h{font-family:var(--doc-mono);font-size:.72rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--doc-accent-deep);font-weight:600;margin-bottom:7px}
+.doc-action ol{margin:0;padding-left:1.3em}
+.doc-action li{margin:5px 0;font-size:.92rem}
+
+.doc-colophon{font-size:.86rem;color:var(--doc-ink-3);border-top:1px solid var(--doc-line);
+  padding-top:18px;margin-top:34px;max-width:none}
+
+/* 来源登记表 */
+.doc-refs{margin-top:56px;padding-top:26px;border-top:2px solid var(--doc-ink)}
+.doc-refs h2{border:none;margin-top:0}
+.doc-ref-list{list-style:none;padding:0;margin:0;display:grid;gap:2px;max-width:none}
+.doc-ref-list li{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:11px 12px;
+  border-radius:3px;background:var(--doc-surface);border:1px solid var(--doc-line-2);margin:0}
+.doc-ref-list li:target{border-color:var(--doc-accent);background:var(--doc-accent-soft)}
+.doc-ref-no{font-family:var(--doc-mono);font-size:.82rem;color:var(--doc-accent);
+  font-weight:600;text-align:right;padding-top:1px}
+.doc-ref-t{font-size:.92rem;line-height:1.5}
+.doc-ref-t a{color:var(--doc-ink);text-decoration:none;border-bottom:1px solid var(--doc-accent)}
+.doc-ref-t a:hover{color:var(--doc-accent)}
+.doc-ref-m{font-size:.8rem;color:var(--doc-ink-3);margin-top:3px;line-height:1.55}
+.doc-tier{font-family:var(--doc-mono);font-size:.68rem;font-weight:600;padding:1px 6px;
+  border-radius:2px;background:var(--doc-sunk);color:var(--doc-ink-2);white-space:nowrap}
+.doc-tier-A{background:var(--doc-pos-soft);color:var(--doc-pos)}
+.doc-tier-Am{background:var(--doc-accent-soft);color:var(--doc-accent-deep)}
+.doc-tier-B{background:var(--doc-warn-soft);color:var(--doc-warn)}
+.doc-flag{font-family:var(--doc-mono);font-size:.68rem;padding:1px 6px;border-radius:2px;
+  background:var(--doc-sunk);color:var(--doc-ink-3);white-space:nowrap}
+.doc-flag-warn{background:var(--doc-warn-soft);color:var(--doc-warn)}
+.doc-foot{font-size:.85rem;color:var(--doc-ink-3);margin-top:20px;max-width:none}
+
+a:focus-visible,.doc-toc a:focus-visible{outline:2px solid var(--doc-accent);outline-offset:2px}
+
+@media (max-width:720px){
+  .doc{padding:0 16px 60px}
+  .doc-masthead h1{font-size:1.7rem}
+  .doc-meta>div{min-width:50%}
+  .doc h2{font-size:1.24rem}
+}
+@media print{
+  .doc-toc{display:none}
+  body{background:#fff}
+  .doc-action,.doc-table-wrap,.doc-ref-list li{break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* plan.css */
+/* plan —— 默认主题。执行手册气质:冷灰底 + 钢青,像工程图纸/训练台账。
+   适合:计划、方案、执行手册、带仪表和表格的交付物。
+   ⚠️ 只用系统字体栈,不外链字体 —— 成品必须真正自包含(离线可读、可转发)。 */
+
+:root{
+  --doc-ground:#f6f8f9; --doc-surface:#ffffff; --doc-sunk:#eef2f4;
+  --doc-ink:#141b22; --doc-ink-2:#42505e; --doc-ink-3:#6b7a89;
+  --doc-line:#dde5e9; --doc-line-2:#e9eff2;
+  --doc-accent:#0e6a7e; --doc-accent-soft:#e0eef1; --doc-accent-deep:#0a4e5d;
+  --doc-pos:#1a7a4a; --doc-pos-soft:#e4f2ea;
+  --doc-warn:#9a6b18; --doc-warn-soft:#f8efdd;
+  --doc-neg:#a83232; --doc-neg-soft:#f9e8e7;
+  --doc-mono:"Cascadia Code","JetBrains Mono",Consolas,"SF Mono",ui-monospace,monospace;
+  --doc-sans:"Segoe UI Variable Text","Segoe UI",-apple-system,"PingFang SC",
+             "Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --doc-ground:#0e1418; --doc-surface:#151d23; --doc-sunk:#1b252c;
+    --doc-ink:#e5edf1; --doc-ink-2:#a8b8c4; --doc-ink-3:#7d8f9c;
+    --doc-line:#28353d; --doc-line-2:#1f2b32;
+    --doc-accent:#4fc3d9; --doc-accent-soft:#0d3941; --doc-accent-deep:#8fdcec;
+    --doc-pos:#5cc98d; --doc-pos-soft:#10331f;
+    --doc-warn:#e0aa4a; --doc-warn-soft:#3a2c0e;
+    --doc-neg:#f08a86; --doc-neg-soft:#3d1a19;
+  }
+}
+:root[data-theme="dark"]{
+  --doc-ground:#0e1418; --doc-surface:#151d23; --doc-sunk:#1b252c;
+  --doc-ink:#e5edf1; --doc-ink-2:#a8b8c4; --doc-ink-3:#7d8f9c;
+  --doc-line:#28353d; --doc-line-2:#1f2b32;
+  --doc-accent:#4fc3d9; --doc-accent-soft:#0d3941; --doc-accent-deep:#8fdcec;
+  --doc-pos:#5cc98d; --doc-pos-soft:#10331f;
+  --doc-warn:#e0aa4a; --doc-warn-soft:#3a2c0e;
+  --doc-neg:#f08a86; --doc-neg-soft:#3d1a19;
+}
+
+</style></head><body>
+<div class="doc">
+<header class="doc-masthead">
+<h1>新能源汽车下乡与县域充电设施</h1>
+
+<div class="doc-meta"><div><div class="k">章节</div><div class="v">5</div></div><div><div class="k">文内引用</div><div class="v">42</div></div><div><div class="k">证据卡</div><div class="v">18</div></div><div><div class="k">参考来源</div><div class="v">26</div></div></div>
+</header>
+<nav class="doc-toc"><a href="#doc-s1"><span class="n">1</span>一、问题与判断</a><a href="#doc-s2"><span class="n">2</span>二、县域充电设施是怎么变的</a><a href="#doc-s3"><span class="n">3</span>三、下乡活动起了多大作用</a><a href="#doc-s4"><span class="n">4</span>四、其他推动因素</a><a href="#doc-s5"><span class="n">5</span>五、政策建议</a></nav>
+
+<main>
+<section class="doc-sec" id="doc-s1">
+<h2><span class="doc-secnum">1</span>一、问题与判断</h2>
+<p>厅里想弄清楚的是：这几年的新能源汽车下乡活动，到底有没有带动县里的公共充电桩建设，这笔钱花得值不值。这份内参按事先写进任务计划的判定标准来回答，标准在找资料之前就定下了：参加活动的县，活动后公共充电设施增速明显高于没参加的县，而且新增的主要是公共桩，算「成立」；增速更高，但主要来自其他政策，算「部分成立」；两类县没有明显差别，算「不成立」。</p>
+<p>对照收集到的资料，结论是「部分成立」。参加活动的县，公共桩年均增速确实更高<sup class="doc-cite"><a href="#doc-ref-1" title="《H 省三地市县域充电设施建设通报（2025）》（虚构）">[1]</a></sup>，新增的公共桩也主要落在参加县<sup class="doc-cite"><a href="#doc-ref-2" title="《H 省县域充电设施建设通报汇总表》（虚构）">[2]</a></sup>；但同期全省的农村电网改造和高速公路服务区建设也在推动县域装桩<sup class="doc-cite"><a href="#doc-ref-3" title="《H 省农村电网巩固提升工程进展情况》（虚构）">[3]</a></sup><sup class="doc-cite"><a href="#doc-ref-4" title="《H 省交通运输发展统计公报 2024》（虚构）">[4]</a></sup>，几股力量叠在一起，活动单独贡献了多少，现有资料分不开。</p>
+<p>换句话说，钱没有白花：参加县的公共桩建得更快，县城快充站基本建成，新建的桩也用起来了。但如果要说「县里的充电桩是下乡活动带起来的」，证据不够。下文先讲县域充电设施这几年是怎么变的，再讲活动起了多大作用、还有哪些因素在推，最后提五条建议。</p>
+<p>需要先说明三点口径。第一，县域公共充电设施指县级行政区内对社会开放的充电桩，含乡镇，不含村，私人桩和单位内部桩不算。第二，2021 年的分县充电桩数省统计局和能源局都没有公布，所以活动前后的对比从 2022 年算起。第三，分县增速只有 A、B、C 三个地市公布过，结论只适用于 H 省平原地区的县，不能推到全国。</p>
+</section>
+<section class="doc-sec" id="doc-s2">
+<h2><span class="doc-secnum">2</span>二、县域充电设施是怎么变的</h2>
+<p>先看规模。截至 2024 年底，H 省县域公共充电桩达到 2.3 万台<sup class="doc-cite"><a href="#doc-ref-5" title="《H 省能源发展年度报告 2025》（虚构）">[5]</a></sup>，这个数是县级行政区合计，不含私人桩，也不含单位内部的桩。A 市的统计公报给出了本市各县的分项数字，加总后与省里的口径一致<sup class="doc-cite"><a href="#doc-ref-6" title="《A 市统计公报 2024》（虚构）">[6]</a></sup>。由于 2021 年没有分县数据，这里不说「几年翻了几番」这类话，只说 2024 年底的规模。</p>
+<p>2025 年的数据还不全。2025 年前三季度，A、B、C 三个地市的参加县又新增公共桩 1900 台<sup class="doc-cite"><a href="#doc-ref-7" title="《H 省充电设施运行监测季报（2025 年第三季度）》（虚构）">[7]</a></sup>，全年数字要等年报公布。全年数字出来之前，本报告不把 2025 年算进任何比较。</p>
+<p>再看分布。2023—2024 年，A、B、C 三个地市的参加县新增公共桩 5800 台<sup class="doc-cite"><a href="#doc-ref-2" title="《H 省县域充电设施建设通报汇总表》（虚构）">[2]</a></sup>，占同期全省县域新增的 64%<sup class="doc-cite"><a href="#doc-ref-2" title="《H 省县域充电设施建设通报汇总表》（虚构）">[2]</a></sup>。需要提醒的是，分子只有三个地市，分母来自省级口径，两个口径混用的数字只能说明新增主要集中在参加县，不能拿来算精确的份额。B 市的专报也显示，参加县的新增站点明显多于未参加县，而且集中在活动开始后的两年<sup class="doc-cite"><a href="#doc-ref-8" title="《B 市县域充电设施建设专报》（虚构）">[8]</a></sup>。</p>
+<p>新增的公共桩不只在县城。2022—2024 年参加县新增公共桩里，乡镇站点占 38%<sup class="doc-cite"><a href="#doc-ref-9" title="《H 省三地市县域充电设施建设通报（2025）附表》（虚构）">[9]</a></sup>。C 市的材料提到，乡镇站点多建在乡镇政府驻地和集镇路口，方便赶集和办事的人顺路充电<sup class="doc-cite"><a href="#doc-ref-10" title="《C 市乡镇充电站建设情况》（虚构）">[10]</a></sup>。不过乡镇站点用得怎么样，全省没有统一口径，只有两个地市的零散报道，这是本报告的资料缺口之一。</p>
+<p>县城这一层基本建成了。到 2024 年底，参加县中县城建成至少一座公共快充站的比例是 92%<sup class="doc-cite"><a href="#doc-ref-11" title="《H 省能源发展年度报告 2025》第 4 章（虚构）">[11]</a></sup>。A 市交通运输局的工作总结也提到，县城快充站已经成为县级政府考核的硬指标，没建成的县要说明原因<sup class="doc-cite"><a href="#doc-ref-12" title="《A 市交通运输局 2024 年工作总结》（虚构）">[12]</a></sup>。覆盖率只说明有没有，不说明够不够用，所以还要看使用情况。</p>
+<p>使用强度在上升。参加县公共桩平均每天充电的时长，2022 年是 1.9 小时<sup class="doc-cite"><a href="#doc-ref-13" title="《H 省充电设施运行监测季报（2022 年第四季度）》（虚构）">[13]</a></sup>，2024 年是 3.2 小时<sup class="doc-cite"><a href="#doc-ref-14" title="《H 省充电设施运行监测季报（2024 年第四季度）》（虚构）">[14]</a></sup>。车多了是一个原因：2024 年参加县新能源汽车保有量是 2022 年的 2.1 倍<sup class="doc-cite"><a href="#doc-ref-15" title="《H 省新能源汽车下乡活动总结（2024）》（虚构）">[15]</a></sup>，省里的推广应用年报也有相近的判断<sup class="doc-cite"><a href="#doc-ref-16" title="《H 省新能源汽车推广应用年报 2024》（虚构）">[16]</a></sup>。车和桩是互相带动的：桩多了，买车的人顾虑少一些；车多了，桩的利用率上来，运营单位才愿意继续投。</p>
+<p>但平均数掩盖了站点之间的差别。参加县 2023—2024 年新建的公共快充站里，日均充电不足 0.5 小时的站点占 17%<sup class="doc-cite"><a href="#doc-ref-17" title="《H 省充电设施运行监测季报（2024 年第四季度）》表 7（虚构）">[17]</a></sup>。这些站点闲置的原因，可能是选址偏、电价高、宣传少，也可能是周边本来就没有多少车，现有资料说明不了，需要专门调查。</p>
+</section>
+<section class="doc-sec" id="doc-s3">
+<h2><span class="doc-secnum">3</span>三、下乡活动起了多大作用</h2>
+<p>下乡活动带给县里的，主要是两样东西：钱和指标。钱是补贴：2023 年起，参加县新建的公共快充站，每座补贴 30 万元<sup class="doc-cite"><a href="#doc-ref-18" title="《关于支持新能源汽车下乡配套充电设施建设的通知》（虚构）">[18]</a></sup>，省财政厅当年就下达了专项资金<sup class="doc-cite"><a href="#doc-ref-19" title="《H 省财政厅 2023 年专项资金下达通知》（虚构）">[19]</a></sup>。指标是考核：61 个参加县里，有 47 个把公共桩建设纳入了对乡镇和部门的考核<sup class="doc-cite"><a href="#doc-ref-20" title="《H 省新能源汽车下乡活动总结（2024）》第三部分（虚构）">[20]</a></sup>，省里的绩效考核指标说明也把充电设施列为加分项<sup class="doc-cite"><a href="#doc-ref-21" title="《H 省县级政府绩效考核指标说明（2023）》（虚构）">[21]</a></sup>。有钱、有指标，县里推建桩的动力是实打实的。</p>
+<p>从结果看，参加活动的县，公共桩增速比没参加的县更高<sup class="doc-cite"><a href="#doc-ref-1" title="《H 省三地市县域充电设施建设通报（2025）》（虚构）">[1]</a></sup>；这个对比只来自 A、B、C 三个地市的数据，不能当全省的数字用。增速更高说明活动没有落空，但还不能说明多出来的部分都是活动带来的，下一小节专门讲这一点。</p>
+<p>活动的范围也要交代清楚。下乡活动分三批，共 61 个县<sup class="doc-cite"><a href="#doc-ref-22" title="《关于公布新能源汽车下乡活动参加县名单的通知》（虚构）">[22]</a></sup>。名单之外的县，同样能享受省级规划里的建站安排：早在 2021 年，省里就规划到 2025 年实现县城快充站全覆盖<sup class="doc-cite"><a href="#doc-ref-23" title="《H 省县域充电设施建设规划（2021—2025）》（虚构）">[23]</a></sup>。也就是说，县城快充站的建设，有一部分是规划在推，并不都是活动的功劳。</p>
+<p>购车热度也是背景。一家车企自报 2024 年县域销量同比 +34%<sup class="doc-cite"><a href="#doc-ref-24" title="某车企 2024 年县域市场新闻稿（虚构）">[24]</a></sup>，这个数没有第三方核实，只能当背景，不能当证据。活动期间的展销、补贴和金融优惠确实让县里买车的人多了，但多了多少，要等官方的分县保有量数据。</p>
+<h3>3.1 增速对比</h3>
+<p>最直接的证据是增速对比。2022—2024 年，A、B、C 三个地市的参加县，公共桩年均增速 41%，未参加县是 23%<sup class="doc-cite"><a href="#doc-ref-1" title="《H 省三地市县域充电设施建设通报（2025）》（虚构）">[1]</a></sup>。B 市的专报给出的分县数字与通报一致<sup class="doc-cite"><a href="#doc-ref-8" title="《B 市县域充电设施建设专报》（虚构）">[8]</a></sup>。</p>
+<div class="doc-table-wrap"><table><thead><tr><th>比较项</th><th>参加县</th><th>未参加县</th></tr></thead><tbody><tr><td>公共桩年均增速（2022—2024）</td><td>41%</td><td>23%</td></tr><tr><td>数据范围</td><td>A、B、C 三个地市</td><td>A、B、C 三个地市</td></tr></tbody></table></div>
+<p>这个差距不小，方向也稳定，三个地市各自比都是参加县更快。</p>
+<p>但这个对比有三处要小心。第一，它只来自三个地市，其他地市没有公布分县数字，不能当全省数字用<sup class="doc-cite"><a href="#doc-ref-25" title="《H 省三地市县域充电设施建设通报（2025）》附表注（虚构）">[25]</a></sup>。第二，没参加的县里，有 6 个山区县增速同样超过 30%<sup class="doc-cite"><a href="#doc-ref-25" title="《H 省三地市县域充电设施建设通报（2025）》附表注（虚构）">[25]</a></sup>，只是基数很小，百分比放大了增长。第三，2021 年没有分县数据，所以不能说参加县的公共桩「翻了一番」，只能说 2022 年以来增速更高。</p>
+<p>还要排除一种可能：参加县本来就是基础好的县，不参加活动也会长得快。名单的入选条件里有「县城有快充站建设条件」这一条<sup class="doc-cite"><a href="#doc-ref-22" title="《关于公布新能源汽车下乡活动参加县名单的通知》（虚构）">[22]</a></sup>，说明入选的县起点不低。这一点会把增速差距放大，现有资料估不出放大了多少。</p>
+<p>所以，增速对比能说明的是：参加县的公共桩确实长得更快，而且新增的主要是公共桩<sup class="doc-cite"><a href="#doc-ref-9" title="《H 省三地市县域充电设施建设通报（2025）附表》（虚构）">[9]</a></sup>；不能说明的是：快出来的部分有多少是活动带来的。这也是结论定为「部分成立」而不是「成立」的原因。</p>
+</section>
+<section class="doc-sec" id="doc-s4">
+<h2><span class="doc-secnum">4</span>四、其他推动因素</h2>
+<p>同期还有三股力量在推动县域装桩。</p>
+<p>第一是农村电网改造。全省农村电网巩固提升工程累计覆盖乡镇 1280 个，较 2021 年的 640 个翻一番<sup class="doc-cite"><a href="#doc-ref-3" title="《H 省农村电网巩固提升工程进展情况》（虚构）">[3]</a></sup>。乡镇变电容量上去了，乡镇站点才能建起来；没有电网改造，很多乡镇根本接不上快充桩。这股力量和下乡活动在时间上重叠、在地点上也重叠，两者的贡献分不开。</p>
+<p>第二是高速公路服务区建设。2022—2024 年，全省高速公路服务区新增充电站 210 座，多数位于县域<sup class="doc-cite"><a href="#doc-ref-4" title="《H 省交通运输发展统计公报 2024》（虚构）">[4]</a></sup>。服务区站点算不算县域公共桩，各地统计口径不一：有的地市算进去了，有的没有<sup class="doc-cite"><a href="#doc-ref-26" title="《H 省县域充电设施建设现场会材料》（虚构）">[26]</a></sup>。如果算进去，县域公共桩的增长里有一部分其实来自交通部门的建设，不能算作活动的成绩。</p>
+<p>第三是省级规划。如前所述，2021 年的规划已经提出县城快充站全覆盖的目标<sup class="doc-cite"><a href="#doc-ref-23" title="《H 省县域充电设施建设规划（2021—2025）》（虚构）">[23]</a></sup>，活动是在规划之上加码。</p>
+<p>把这三股力量放在一起看，下乡活动是推动县域公共充电设施增长的重要力量之一，但不是唯一的力量。现有资料能证明的，是参加县长得更快；不能证明的，是活动单独起了多大作用。</p>
+</section>
+<section class="doc-sec" id="doc-s5">
+<h2><span class="doc-secnum">5</span>五、政策建议</h2>
+<p>基于以上判断，提五条建议。</p>
+<p>一是补乡镇。参加县新增站点里乡镇只占 38%<sup class="doc-cite"><a href="#doc-ref-9" title="《H 省三地市县域充电设施建设通报（2025）附表》（虚构）">[9]</a></sup>，而乡镇站点的使用情况说不清。建议下一阶段的补贴向乡镇站点倾斜，并要求运营单位按季度报送乡镇站点的充电时长。</p>
+<p>二是管闲置。参加县新建快充站里有 17% 的站点日均充电不足 0.5 小时<sup class="doc-cite"><a href="#doc-ref-17" title="《H 省充电设施运行监测季报（2024 年第四季度）》表 7（虚构）">[17]</a></sup>。建议对连续两个季度闲置的站点开展核查，查清选址、电价和宣传方面的原因，能迁的迁、能并的并，不再按建成数量发补贴。</p>
+<p>三是补数据。2021 年分县充电桩数缺失，导致活动前后的对比只能从 2022 年算起；分县增速只有三个地市公布<sup class="doc-cite"><a href="#doc-ref-1" title="《H 省三地市县域充电设施建设通报（2025）》（虚构）">[1]</a></sup>。建议由省能源局牵头，统一县域公共桩的统计口径，按年公布分县数字，服务区站点单列。</p>
+<p>四是把考核从「建了多少」改成「用得怎么样」。目前纳入考核的 47 个县，多数考核的是建成数量<sup class="doc-cite"><a href="#doc-ref-20" title="《H 省新能源汽车下乡活动总结（2024）》第三部分（虚构）">[20]</a></sup><sup class="doc-cite"><a href="#doc-ref-21" title="《H 省县级政府绩效考核指标说明（2023）》（虚构）">[21]</a></sup>。建议把日均充电时长和故障率纳入考核，避免为了完成指标而建闲置站点。</p>
+<p>五是做一次分开效果的评估。农网改造、服务区建设和下乡活动的贡献现在分不开。建议在下一批活动中选取条件相近的县做对照，事先定好评估办法，几年后就能回答活动单独起了多大作用。</p>
+</section>
+</main>
+<section class="doc-refs" id="references">
+<h2><span class="doc-secnum">R</span>参考资料</h2>
+<ol class="doc-ref-list">
+<li id="doc-ref-1"><span class="doc-ref-no">1</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/county-charging-notice-2025.pdf">《H 省三地市县域充电设施建设通报（2025）》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">附表 2</div><div class="doc-ref-m doc-mono">2025-03-31</div></div></li>
+<li id="doc-ref-2"><span class="doc-ref-no">2</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/county-charging-summary.xlsx">《H 省县域充电设施建设通报汇总表》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">附表 1</div><div class="doc-ref-m doc-mono">2025-03-31</div></div></li>
+<li id="doc-ref-3"><span class="doc-ref-no">3</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/rural-grid-progress-2024.pdf">《H 省农村电网巩固提升工程进展情况》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第二部分</div><div class="doc-ref-m doc-mono">2025-01-10</div></div></li>
+<li id="doc-ref-4"><span class="doc-ref-no">4</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/transport-bulletin-2024.pdf">《H 省交通运输发展统计公报 2024》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第五部分</div><div class="doc-ref-m doc-mono">2025-04-08</div></div></li>
+<li id="doc-ref-5"><span class="doc-ref-no">5</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/energy-report-2025.pdf">《H 省能源发展年度报告 2025》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第 4 章表 4-3</div><div class="doc-ref-m doc-mono">2025-06-30</div></div></li>
+<li id="doc-ref-6"><span class="doc-ref-no">6</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/a-city-bulletin-2024.pdf">《A 市统计公报 2024》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">表 9</div><div class="doc-ref-m doc-mono">2025-03-15</div></div></li>
+<li id="doc-ref-7"><span class="doc-ref-no">7</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/charging-monitor-2025q3.pdf">《H 省充电设施运行监测季报（2025 年第三季度）》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">表 2</div><div class="doc-ref-m doc-mono">2025-10-20</div></div></li>
+<li id="doc-ref-8"><span class="doc-ref-no">8</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/b-city-charging-brief.pdf">《B 市县域充电设施建设专报》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">第二页</div><div class="doc-ref-m doc-mono">2025-02-28</div></div></li>
+<li id="doc-ref-9"><span class="doc-ref-no">9</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/county-charging-notice-2025-annex.pdf">《H 省三地市县域充电设施建设通报（2025）附表》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">附表 3</div><div class="doc-ref-m doc-mono">2025-03-31</div></div></li>
+<li id="doc-ref-10"><span class="doc-ref-no">10</span><div><div class="doc-ref-t"><span class="doc-flag doc-flag-warn">⚠️ 链接失效</span> <a href="https://example.org/h-province/c-city-township-stations.html">《C 市乡镇充电站建设情况》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">第一部分</div><div class="doc-ref-m doc-mono">2024-11-30</div></div></li>
+<li id="doc-ref-11"><span class="doc-ref-no">11</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/energy-report-2025-ch4.pdf">《H 省能源发展年度报告 2025》第 4 章（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第 4 章第三节</div><div class="doc-ref-m doc-mono">2025-06-30</div></div></li>
+<li id="doc-ref-12"><span class="doc-ref-no">12</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/a-city-transport-2024.pdf">《A 市交通运输局 2024 年工作总结》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">第四部分</div><div class="doc-ref-m doc-mono">2025-01-31</div></div></li>
+<li id="doc-ref-13"><span class="doc-ref-no">13</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/charging-monitor-2022q4.pdf">《H 省充电设施运行监测季报（2022 年第四季度）》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">表 5</div><div class="doc-ref-m doc-mono">2023-02-15</div></div></li>
+<li id="doc-ref-14"><span class="doc-ref-no">14</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/charging-monitor-2024q4.pdf">《H 省充电设施运行监测季报（2024 年第四季度）》（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">表 5</div><div class="doc-ref-m doc-mono">2025-02-15</div></div></li>
+<li id="doc-ref-15"><span class="doc-ref-no">15</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/nev-countryside-summary-2024.pdf">《H 省新能源汽车下乡活动总结（2024）》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第二部分</div><div class="doc-ref-m doc-mono">2025-01-20</div></div></li>
+<li id="doc-ref-16"><span class="doc-ref-no">16</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/nev-annual-2024.pdf">《H 省新能源汽车推广应用年报 2024》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第三章</div><div class="doc-ref-m doc-mono">2025-04-30</div></div></li>
+<li id="doc-ref-17"><span class="doc-ref-no">17</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/charging-monitor-2024q4-t7.pdf">《H 省充电设施运行监测季报（2024 年第四季度）》表 7（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">表 7</div><div class="doc-ref-m doc-mono">2025-02-15</div></div></li>
+<li id="doc-ref-18"><span class="doc-ref-no">18</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/subsidy-notice-2023.pdf">《关于支持新能源汽车下乡配套充电设施建设的通知》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第三条</div><div class="doc-ref-m doc-mono">2023-03-01</div></div></li>
+<li id="doc-ref-19"><span class="doc-ref-no">19</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/special-funds-2023.pdf">《H 省财政厅 2023 年专项资金下达通知》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">附件</div><div class="doc-ref-m doc-mono">2023-06-15</div></div></li>
+<li id="doc-ref-20"><span class="doc-ref-no">20</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/nev-countryside-summary-2024-part3.pdf">《H 省新能源汽车下乡活动总结（2024）》第三部分（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第三部分</div><div class="doc-ref-m doc-mono">2025-01-20</div></div></li>
+<li id="doc-ref-21"><span class="doc-ref-no">21</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/county-assessment-2023.pdf">《H 省县级政府绩效考核指标说明（2023）》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第十条</div><div class="doc-ref-m doc-mono">2023-04-10</div></div></li>
+<li id="doc-ref-22"><span class="doc-ref-no">22</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/county-list-2024.pdf">《关于公布新能源汽车下乡活动参加县名单的通知》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">附件</div><div class="doc-ref-m doc-mono">2024-05-20</div></div></li>
+<li id="doc-ref-23"><span class="doc-ref-no">23</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/county-charging-plan-2021.pdf">《H 省县域充电设施建设规划（2021—2025）》（虚构）</a> <span class="doc-tier doc-tier-A">一手(A级)</span></div><div class="doc-ref-m">第二章</div><div class="doc-ref-m doc-mono">2021-08-01</div></div></li>
+<li id="doc-ref-24"><span class="doc-ref-no">24</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/carmaker-press-2024.html">某车企 2024 年县域市场新闻稿（虚构）</a> <span class="doc-tier doc-tier-B">二手(B级)</span> <span class="doc-flag">转引自 企业自报，未见第三方核实</span></div><div class="doc-ref-m">第二段</div><div class="doc-ref-m doc-mono">2025-01-15</div></div></li>
+<li id="doc-ref-25"><span class="doc-ref-no">25</span><div><div class="doc-ref-t"><a href="https://example.org/h-province/county-charging-notice-2025-notes.pdf">《H 省三地市县域充电设施建设通报（2025）》附表注（虚构）</a> <span class="doc-tier doc-tier-Am">机构披露(A−级)</span></div><div class="doc-ref-m">附表 2 注</div><div class="doc-ref-m doc-mono">2025-03-31</div></div></li>
+<li id="doc-ref-26"><span class="doc-ref-no">26</span><div><div class="doc-ref-t"><span class="doc-flag doc-flag-warn">⚠️ 链接失效</span> <a href="https://example.org/h-province/county-charging-meeting-2024.html">《H 省县域充电设施建设现场会材料》（虚构）</a> <span class="doc-tier doc-tier-B">二手(B级)</span> <span class="doc-flag">转引自 会议材料，转引自地市汇报</span></div><div class="doc-ref-m">第二部分</div><div class="doc-ref-m doc-mono">2024-09-20</div></div></li>
+</ol>
+<p class="doc-foot">来源层级:A=官方/院校一手文件,A−=机构自报披露,B=行业协会/媒体/平台(二手)。</p>
+</section>
+</div>
+</body></html>

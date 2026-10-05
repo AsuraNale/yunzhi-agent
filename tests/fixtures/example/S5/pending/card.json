@@ -1,0 +1,304 @@
+{
+ "schema": "yunzhi.card/1",
+ "card_id": "card-00000000-0000-4000-8000-000000000011",
+ "project_id": "proj-68ca27a97d9c4bad",
+ "kind": "delivery",
+ "gate_id": "delivery",
+ "question_id": "q-fixture-011",
+ "item_id": "ann-gate:delivery",
+ "call_id": "call-fixture-011",
+ "shown_at": "2026-10-05T16:00:00-04:00",
+ "attempt": 1,
+ "title": [
+  {
+   "type": "fixed",
+   "text": "交付确认"
+  }
+ ],
+ "badge": [
+  {
+   "type": "fixed",
+   "text": "等你决定"
+  }
+ ],
+ "question": [
+  {
+   "type": "fixed",
+   "text": "成稿可以交付了吗？"
+  }
+ ],
+ "blocks": [
+  {
+   "key": "materials",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "依据的材料"
+    }
+   ],
+   "rows": [
+    {
+     "key": "draft",
+     "segments": [
+      {
+       "type": "fixed",
+       "text": "成稿（"
+      },
+      {
+       "type": "counted",
+       "text": "Word 版 · 网页版",
+       "source": "out/ · 成稿文件"
+      },
+      {
+       "type": "fixed",
+       "text": "）"
+      }
+     ],
+     "open": "draft",
+     "open_label": [
+      {
+       "type": "fixed",
+       "text": "点开看 ›"
+      }
+     ]
+    },
+    {
+     "key": "checks",
+     "segments": [
+      {
+       "type": "fixed",
+       "text": "交付前检查："
+      },
+      {
+       "type": "counted",
+       "text": "全部通过",
+       "source": "cite_check · 没有 FAIL"
+      }
+     ],
+     "open": "checks",
+     "open_label": [
+      {
+       "type": "fixed",
+       "text": "点开看 ›"
+      }
+     ]
+    },
+    {
+     "key": "review",
+     "segments": [
+      {
+       "type": "fixed",
+       "text": "独立复核：必须改的 "
+      },
+      {
+       "type": "counted",
+       "text": "0 处",
+       "source": "review/result.json · counts.must_fix"
+      },
+      {
+       "type": "fixed",
+       "text": "，说法收了 "
+      },
+      {
+       "type": "counted",
+       "text": "1 处",
+       "source": "review/result.json · counts.tone_down"
+      }
+     ],
+     "open": "review",
+     "open_label": [
+      {
+       "type": "fixed",
+       "text": "点开看 ›"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "points",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "请你重点看这三点"
+    }
+   ],
+   "rows": [
+    {
+     "label": [
+      {
+       "type": "fixed",
+       "text": "改动内容："
+      }
+     ],
+     "text": [
+      {
+       "type": "agent",
+       "field": "library/delivery_commitments.md · 三点 1",
+       "cap": 60,
+       "from": "library/delivery_commitments.md · 1",
+       "text": "第四节标题按你的意见改了；没有改动任何判断。"
+      }
+     ]
+    },
+    {
+     "label": [
+      {
+       "type": "fixed",
+       "text": "最薄弱的依据："
+      }
+     ],
+     "text": [
+      {
+       "type": "agent",
+       "field": "library/delivery_commitments.md · 三点 2",
+       "cap": 60,
+       "from": "library/delivery_commitments.md · 2",
+       "text": "第三节参加县增速 41% 只来自 3 个地市的数据。"
+      }
+     ]
+    },
+    {
+     "label": [
+      {
+       "type": "fixed",
+       "text": "最可能出错的地方："
+      }
+     ],
+     "text": [
+      {
+       "type": "agent",
+       "field": "library/delivery_commitments.md · 三点 3",
+       "cap": 80,
+       "from": "library/delivery_commitments.md · 3",
+       "text": "2025 年数据只到三季度，全年数字公布后可能变化。"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "options": [
+  {
+   "key": "deliver",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "交付成稿"
+    }
+   ],
+   "description": [
+    {
+     "type": "fixed",
+     "text": "交付后不能撤回。这次用到的来源和资料缺口会存进项目，留给以后的课题。"
+    }
+   ],
+   "primary": true
+  },
+  {
+   "key": "not_yet",
+   "label": [
+    {
+     "type": "fixed",
+     "text": "先不交付，回去改"
+    }
+   ],
+   "description": [
+    {
+     "type": "fixed",
+     "text": "告诉我改哪里。"
+    }
+   ],
+   "primary": false
+  }
+ ],
+ "note": {
+  "label": [
+   {
+    "type": "fixed",
+    "text": "你的意见（可选）"
+   }
+  ],
+  "placeholder": [
+   {
+    "type": "fixed",
+    "text": "也可以直接写你的意见……"
+   }
+  ]
+ },
+ "footer": [
+  {
+   "type": "fixed",
+   "text": "你点「交付」后，由云织写下交付记录。"
+  }
+ ],
+ "data": {
+  "files": [
+   {
+    "path": "out/新能源汽车下乡与县域充电设施.html",
+    "sha256": "0298439b27aa8fd0ce73d186673b8136ff5cb874ad647b090a9b8d267271b778"
+   },
+   {
+    "path": "out/新能源汽车下乡与县域充电设施.docx",
+    "sha256": "4dcc23c1f9cd1c6e8256d10690497068174dbe537c615d3b9561880a6c3e1685"
+   }
+  ],
+  "formats": [
+   "Word 版",
+   "网页版"
+  ],
+  "checks": {
+   "total": 15,
+   "fail": 0,
+   "warn": 0,
+   "pass": 15
+  },
+  "review": {
+   "round": 2,
+   "counts": {
+    "must_fix": 0,
+    "tone_down": 1,
+    "citation_or_format": 0,
+    "checked_ok": 5
+   }
+  },
+  "points": [
+   {
+    "label": "改动内容",
+    "content": "第四节标题按你的意见改了；没有改动任何判断。",
+    "length": 22,
+    "cap": 60
+   },
+   {
+    "label": "最薄弱的依据",
+    "content": "第三节参加县增速 41% 只来自 3 个地市的数据。",
+    "length": 26,
+    "cap": 60
+   },
+   {
+    "label": "最可能出错的地方",
+    "content": "2025 年数据只到三季度，全年数字公布后可能变化。",
+    "length": 26,
+    "cap": 80
+   }
+  ]
+ },
+ "materials": [
+  {
+   "key": "draft",
+   "path": "out/新能源汽车下乡与县域充电设施.html",
+   "sha256": "0298439b27aa8fd0ce73d186673b8136ff5cb874ad647b090a9b8d267271b778"
+  },
+  {
+   "key": "draft",
+   "path": "out/新能源汽车下乡与县域充电设施.docx",
+   "sha256": "4dcc23c1f9cd1c6e8256d10690497068174dbe537c615d3b9561880a6c3e1685"
+  },
+  {
+   "key": "delivery_points",
+   "path": "library/delivery_commitments.md",
+   "sha256": "78fbd76567b7d6c730e25fb83ca688babafdeec4d295ebd7d7e951118242d4de"
+  }
+ ],
+ "replaced": []
+}

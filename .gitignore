@@ -1,0 +1,13 @@
+# 用户的研究项目（委托、材料、成稿、记录）一律不进仓
+/projects/
+
+# Python 缓存与测试临时文件
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 示例夹具里客户端生成的测试签名密钥（固定标签派生、只给测试用；不进仓，免得被当成密钥）
+tests/fixtures/example/test-key/
+
+# 脚本用的临时文件夹(工作区里建,用完就删;不用系统临时文件夹:Codex 沙盒写不进去)
+/.yz-tmp/

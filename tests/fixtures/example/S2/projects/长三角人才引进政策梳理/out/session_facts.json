@@ -1,0 +1,25 @@
+{
+ "session": "0192c7a1-3d4e-7f00-8000-00000000c1a5",
+ "session_picked_by": "DSH_SESSION_ID(harness 注入)",
+ "captured_at": "2026-09-23T14:50:00.000Z",
+ "sessions_root": null,
+ "subagent_sessions": [],
+ "steps_used": 41,
+ "steps_incl_subagents": 41,
+ "toolkit_root": null,
+ "outside_reads": [],
+ "scope_counts": {
+  "outside_toolkit": 0,
+  "harness_temp": 0,
+  "other_project": 0,
+  "toolkit_internal": 0,
+  "unclassified": 0
+ },
+ "shell_calls": 0,
+ "shell_calls_by_tool": {
+  "pwsh": 0,
+  "bash": 0
+ },
+ "log_notes": [],
+ "note": "outside_reads 是下限:shell(pwsh / bash)的命令行未解析,相对路径的读取也不在内"
+}

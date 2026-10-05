@@ -1,0 +1,36 @@
+/* plan —— 默认主题。执行手册气质:冷灰底 + 钢青,像工程图纸/训练台账。
+   适合:计划、方案、执行手册、带仪表和表格的交付物。
+   ⚠️ 只用系统字体栈,不外链字体 —— 成品必须真正自包含(离线可读、可转发)。 */
+
+:root{
+  --doc-ground:#f6f8f9; --doc-surface:#ffffff; --doc-sunk:#eef2f4;
+  --doc-ink:#141b22; --doc-ink-2:#42505e; --doc-ink-3:#6b7a89;
+  --doc-line:#dde5e9; --doc-line-2:#e9eff2;
+  --doc-accent:#0e6a7e; --doc-accent-soft:#e0eef1; --doc-accent-deep:#0a4e5d;
+  --doc-pos:#1a7a4a; --doc-pos-soft:#e4f2ea;
+  --doc-warn:#9a6b18; --doc-warn-soft:#f8efdd;
+  --doc-neg:#a83232; --doc-neg-soft:#f9e8e7;
+  --doc-mono:"Cascadia Code","JetBrains Mono",Consolas,"SF Mono",ui-monospace,monospace;
+  --doc-sans:"Segoe UI Variable Text","Segoe UI",-apple-system,"PingFang SC",
+             "Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --doc-ground:#0e1418; --doc-surface:#151d23; --doc-sunk:#1b252c;
+    --doc-ink:#e5edf1; --doc-ink-2:#a8b8c4; --doc-ink-3:#7d8f9c;
+    --doc-line:#28353d; --doc-line-2:#1f2b32;
+    --doc-accent:#4fc3d9; --doc-accent-soft:#0d3941; --doc-accent-deep:#8fdcec;
+    --doc-pos:#5cc98d; --doc-pos-soft:#10331f;
+    --doc-warn:#e0aa4a; --doc-warn-soft:#3a2c0e;
+    --doc-neg:#f08a86; --doc-neg-soft:#3d1a19;
+  }
+}
+:root[data-theme="dark"]{
+  --doc-ground:#0e1418; --doc-surface:#151d23; --doc-sunk:#1b252c;
+  --doc-ink:#e5edf1; --doc-ink-2:#a8b8c4; --doc-ink-3:#7d8f9c;
+  --doc-line:#28353d; --doc-line-2:#1f2b32;
+  --doc-accent:#4fc3d9; --doc-accent-soft:#0d3941; --doc-accent-deep:#8fdcec;
+  --doc-pos:#5cc98d; --doc-pos-soft:#10331f;
+  --doc-warn:#e0aa4a; --doc-warn-soft:#3a2c0e;
+  --doc-neg:#f08a86; --doc-neg-soft:#3d1a19;
+}

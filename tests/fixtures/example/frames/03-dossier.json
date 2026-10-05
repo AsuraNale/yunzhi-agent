@@ -1,0 +1,31 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-003",
+ "question_id": "q-fixture-003",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:talent-dossier",
+   "question": "Confirm the source digest?",
+   "options": [
+    {
+     "label": "confirm"
+    },
+    {
+     "label": "not_yet"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "talent-dossier",
+    "call_id": "call-fixture-003",
+    "kind": "dossier",
+    "approve": "confirm"
+   },
+   "card": {
+    "kind": "dossier"
+   }
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-008",
+ "question_id": "q-fixture-008",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:decision-2021-data",
+   "question": "2021 年的分县充电桩数据查不到。增速从哪年开始算？",
+   "options": [
+    {
+     "label": "1"
+    },
+    {
+     "label": "2"
+    },
+    {
+     "label": "3"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "decision-2021-data",
+    "call_id": "call-fixture-008",
+    "kind": "decision"
+   },
+   "card": {
+    "kind": "decision",
+    "question": "2021 年的分县充电桩数据查不到。增速从哪年开始算？",
+    "why": "查过省统计局和能源局，都没有公布 2021 年的分县数据。不定下来，「活动前后」的对比就没法算。",
+    "options": [
+     {
+      "label": "从 2022 年开始算",
+      "effect": "少一年，但全是分县数据，结论最站得住。",
+      "changes_plan": false
+     },
+     {
+      "label": "用全省数据补 2021 年",
+      "effect": "年份完整，但 2021 年那段只能说全省，不能说县。",
+      "changes_plan": false
+     },
+     {
+      "label": "改成梳理情况",
+      "effect": "不下判断，只梳理现状。",
+      "changes_plan": true
+     }
+    ],
+    "recommend": 1
+   }
+  }
+ ]
+}

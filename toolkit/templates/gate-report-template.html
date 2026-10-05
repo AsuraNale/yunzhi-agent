@@ -1,0 +1,287 @@
+<!--
+  窗口前可视化报告 · 模板
+  ====================
+  用法:agent 在弹窗口卡之前,按本模板生成 `<project>/out/gate-reports/gate<N>-<日期>.html`,
+  然后在卡前普通消息里给 http 链接(服务见 report-server.bat,127.0.0.1:8130,file: 链接会被 DSH 静默降级)。
+
+  骨架五件套(必有,顺序即阅读顺序):
+    1. 裁定区   —— 这一阶段的核心结论,大字 + 一句 why(对接窗口1=需求与命题;对接窗口2=各命题裁定;对接窗口3=大纲形态;交付对接窗口=成品清单)
+    2. 要你认的三件事 —— 判断三行可视化(①改了什么已批的 ②最脆证据 ③最可能错在哪),与正本 {#commitments} 逐字同源
+    3. 论证区   —— 分维度/分判据展开,关键数字用 .kfig,折损项如实写
+    4. 证据卡   —— 结论各自站在什么上面(强度徽章 + 证据链 chips)
+    5. 边界与缺口 —— gap 五态诚实呈现 + 不会写进成稿的过度推断
+
+  详略三层:
+    - 骨架五件套 = 预设,不许减;
+    - 详细到什么程度 = 按 task_plan E4 记录的用户偏好执行(问过一次,别再问);
+    - 长内容(来源表、rule_trace、逐卡明细)进 <details> 折叠区 —— 渐进展开,别平铺。
+
+  纪律:报告是渲染物不是正本 —— 数字/裁定/三行全部从 dossier/task_plan 正本抄,禁止在报告里产生新内容;
+        正本改了必须重新生成报告(no-cache 已配好,刷新即新)。
+-->
+<title>【对接窗口N · 窗口名】· 【项目短名】</title>
+<style>
+  :root{
+    --bg:#f4f6f8; --card:#ffffff; --ink:#182030; --muted:#5c6878; --line:#dfe5ec; --line2:#eef1f5;
+    --accent:#0e7490; --accent-soft:#e0f2f7;
+    --gold:#a16207; --gold-soft:#fdf3d7;
+    --neg:#b42318; --neg-soft:#fdeceb;
+    --pos:#15803d; --pos-soft:#e5f5ea;
+    --vB:#a16207; --vB-soft:#fdf3d7; --vC:#b42318; --vC-soft:#fdeceb;
+    --mono:"Cascadia Code","JetBrains Mono",Consolas,monospace;
+    --serif:Georgia,"Times New Roman","Noto Serif CJK SC",serif;
+    --sans:"Segoe UI","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1319; --card:#161d26; --ink:#e7ebf1; --muted:#98a4b3; --line:#2a3442; --line2:#212a36;
+      --accent:#22b8d4; --accent-soft:#0d3742;
+      --gold:#eab308; --gold-soft:#3a2e0a;
+      --neg:#f87171; --neg-soft:#3f1a17;
+      --pos:#4ade80; --pos-soft:#0e3a20;
+      --vB:#eab308; --vB-soft:#3a2e0a; --vC:#f87171; --vC-soft:#3f1a17;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1319; --card:#161d26; --ink:#e7ebf1; --muted:#98a4b3; --line:#2a3442; --line2:#212a36;
+    --accent:#22b8d4; --accent-soft:#0d3742;
+    --gold:#eab308; --gold-soft:#3a2e0a;
+    --neg:#f87171; --neg-soft:#3f1a17;
+    --pos:#4ade80; --pos-soft:#0e3a20;
+    --vB:#eab308; --vB-soft:#3a2e0a; --vC:#f87171; --vC-soft:#3f1a17;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.62;margin:0;padding:0 18px 80px}
+  .wrap{max-width:980px;margin:0 auto}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .muted{color:var(--muted)}
+  .tbl{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line2);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:.74rem;text-transform:uppercase;letter-spacing:.07em}
+
+  /* 顶部横幅:窗口号 + 对象版本/hash + 状态 + 锚点导航 */
+  .gatebar{position:sticky;top:0;z-index:9;background:var(--card);border-bottom:1px solid var(--line);
+    padding:10px 18px;margin:0 -18px 0;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:.86rem}
+  .gatebar .tag{background:var(--accent-soft);color:var(--accent);font-weight:700;padding:3px 11px;border-radius:999px;font-size:.8rem;white-space:nowrap}
+  .gatebar nav{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+  .gatebar a{color:var(--muted);text-decoration:none;padding:3px 9px;border-radius:7px;white-space:nowrap}
+  .gatebar a:hover{background:var(--line2);color:var(--ink)}
+
+  header.hero{padding:44px 0 10px}
+  .kicker{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-family:var(--serif);font-size:2.0rem;line-height:1.3;margin:8px 0 10px;text-wrap:balance;font-weight:700}
+  .standfirst{font-size:1.02rem;color:var(--muted);max-width:46em}
+
+  /* 裁定区:.verdict.b 用 gold 系(部分成立类),.verdict.c 用红系(不成立类);全绿结论可自加 .verdict.a 用 --pos */
+  .verdicts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0 8px}
+  .verdict{border-radius:14px;padding:20px 22px;border:1px solid var(--line)}
+  .verdict.b{background:linear-gradient(135deg,var(--vB-soft),var(--card) 70%);border-color:var(--vB)}
+  .verdict.c{background:linear-gradient(135deg,var(--vC-soft),var(--card) 70%);border-color:var(--vC)}
+  .verdict .q{font-size:.82rem;color:var(--muted);margin-bottom:6px}
+  .verdict .grade{font-family:var(--serif);font-size:2.6rem;font-weight:800;line-height:1}
+  .verdict.b .grade{color:var(--vB)} .verdict.c .grade{color:var(--vC)}
+  .verdict .label{font-weight:700;margin:2px 0 8px}
+  .verdict .why{font-size:.88rem;color:var(--muted)}
+  @media (max-width:700px){.verdicts{grid-template-columns:1fr}}
+
+  section{margin:34px 0}
+  h2{font-family:var(--serif);font-size:1.4rem;margin:0 0 4px;padding-top:8px}
+  .seclede{color:var(--muted);font-size:.92rem;margin-bottom:16px;max-width:48em}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+
+  /* 要你认的三件事(判断三行) */
+  /* 「要你认的三件事」= 与窗口卡承诺区**视觉同族**(硬要求)。
+     用 --gold(琥珀)而不是 --accent(青):青与窗口卡的琥珀是两个色族,不满足「同族」。
+     窗口卡侧取值参考:浅色下 底 #fef5e7 / 竖条 #f59e0b。
+     结构本来就同族(带标题的块 + 编号圆 + 加粗引导词 + 灰正文 + 条间分隔线),色相也要对上。 */
+  .ask{border:1.5px solid var(--gold);border-radius:14px;overflow:hidden;margin-top:14px}
+  .ask .head{background:var(--gold-soft);padding:12px 20px;font-weight:700;color:var(--gold)}
+  .ask .body{background:var(--card);padding:6px 22px 16px}
+  .commit{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line2)}
+  .commit:last-child{border-bottom:none}
+  .commit .no{width:30px;height:30px;border-radius:50%;background:var(--gold-soft);color:var(--gold);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--mono)}
+  .commit .t{font-weight:700;margin-bottom:3px}
+  .commit .d{font-size:.9rem;color:var(--muted)}
+  .commit .d b{color:var(--ink)}
+
+  /* 论证区 · 维度行(● s-yes / ◐ s-part / ✕ s-neg) */
+  .dim{display:grid;grid-template-columns:112px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line2)}
+  .dim:last-child{border-bottom:none}
+  .dim .state{font-weight:800;font-size:.92rem;padding-top:2px}
+  .s-yes{color:var(--pos)} .s-part{color:var(--gold)} .s-neg{color:var(--neg)}
+  .dim h3{margin:0 0 4px;font-size:1.02rem}
+  .dim p{margin:0 0 6px;font-size:.92rem}
+  .dim .loss{font-size:.84rem;color:var(--muted)}
+  .dim .loss b{color:var(--neg);font-weight:700}
+  .kfig{font-family:var(--mono);font-variant-numeric:tabular-nums;background:var(--line2);border-radius:6px;padding:1px 7px;white-space:nowrap}
+
+  /* 论证区 · 判据对比行(可选,类比/对照型命题用;.rev 反向红高亮,.weak 弱同向) */
+  .krow{display:grid;grid-template-columns:150px 1fr 34px 1fr;gap:0;border-bottom:1px solid var(--line2);font-size:.88rem}
+  .krow>div{padding:11px 12px}
+  .krow .kname{font-weight:700}
+  .krow .arrow{display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.05rem}
+  .krow.rev .arrow{color:var(--neg)} .krow.weak .arrow{color:var(--gold)}
+  .krow.rev{background:linear-gradient(90deg,transparent 40%,var(--neg-soft) 50%,transparent 60%)}
+  .khead{display:grid;grid-template-columns:150px 1fr 34px 1fr;font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--line)}
+  .khead>div{padding:8px 12px;font-weight:700}
+  .kscore{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .pill{border-radius:999px;padding:4px 14px;font-weight:700;font-size:.86rem}
+  .p-neg{background:var(--neg-soft);color:var(--neg)} .p-weak{background:var(--gold-soft);color:var(--gold)}
+  @media (max-width:760px){.krow,.khead{grid-template-columns:110px 1fr 26px 1fr}}
+
+  /* 证据卡(强度徽章:st-s STRONG / st-ms MED-STRONG / st-m MEDIUM) */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:760px){.cards{grid-template-columns:1fr}}
+  .ecard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px;font-size:.9rem}
+  .ecard .top{display:flex;gap:8px;align-items:baseline;margin-bottom:6px}
+  .ecard .cid{font-family:var(--mono);font-weight:800;color:var(--accent)}
+  .ecard .claim{font-weight:700;line-height:1.4}
+  .ecard .detail{color:var(--muted);font-size:.86rem;margin:6px 0}
+  .strength{font-size:.72rem;font-weight:800;letter-spacing:.04em;padding:2px 9px;border-radius:999px;white-space:nowrap;margin-left:auto}
+  .st-s{background:var(--pos-soft);color:var(--pos)} .st-ms{background:var(--accent-soft);color:var(--accent)} .st-m{background:var(--gold-soft);color:var(--gold)}
+  .ev{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .ev span{font-family:var(--mono);font-size:.72rem;background:var(--line2);border-radius:5px;padding:1px 7px;color:var(--muted)}
+
+  /* 边界与缺口 */
+  .gapgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+  .gap{border:1px dashed var(--line);border-radius:10px;padding:10px 13px;font-size:.85rem;color:var(--muted)}
+  .gap b{color:var(--ink);display:block;font-size:.8rem;margin-bottom:2px}
+  .gap .st{font-family:var(--mono);font-size:.72rem;color:var(--gold)}
+  .gap .st.failed{color:var(--neg)}
+  .dontlist li{margin:5px 0;font-size:.9rem}
+  details{border:1px solid var(--line);border-radius:12px;background:var(--card);margin-top:14px}
+  summary{cursor:pointer;padding:13px 20px;font-weight:700;color:var(--muted)}
+  summary:hover{color:var(--ink)}
+  details .tbl{padding:0 20px 16px}
+  .footer{color:var(--muted);font-size:.84rem;text-align:center;margin-top:44px}
+  a{color:var(--accent)}
+</style>
+
+<div class="gatebar">
+  <span class="tag">对接窗口N · 窗口名</span>
+  <span class="muted">【对象】v# · <span class="num">【hash前12位】</span> · 【规模一句】 · 待你批准</span>
+  <nav>
+    <a href="#verdict">裁定</a><a href="#ask">要你认的</a><a href="#argue">论证</a><a href="#claims">证据卡</a><a href="#honest">边界与缺口</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">【窗口名】报告 · 【批什么】</div>
+    <h1>【研究命题原句,别改写】</h1>
+    <div class="standfirst">【两三句:走到了哪、证据把答案指向哪。加粗一句最核心的话。】</div>
+  </header>
+
+  <!-- 1. 裁定区:每个命题一张;单命题时删一张并把 grid 改单列 -->
+  <div class="verdicts" id="verdict">
+    <div class="verdict b">
+      <div class="q">Q1 · 【命题】</div>
+      <div class="grade">B</div>
+      <div class="label">【一句话裁定】</div>
+      <div class="why">【为什么 —— 引判定表条件,不引感觉】</div>
+    </div>
+    <div class="verdict c">
+      <div class="q">Q2 · 【命题】</div>
+      <div class="grade">C</div>
+      <div class="label">【一句话裁定】</div>
+      <div class="why">【为什么】</div>
+    </div>
+  </div>
+
+  <!-- 2. 要你认的三件事:与正本 {#commitments} 逐字同源,禁止在这里另写一版 -->
+  <section id="ask">
+    <div class="ask">
+      <div class="head">⚖ 这个窗口要你认的三件事(已写进正本、进 hash —— 印章盖的就是含这三条的版本)</div>
+      <div class="body">
+        <div class="commit"><div class="no">①</div><div>
+          <div class="t">【改了什么已批的 —— 判准/口径变更放这里,置顶】</div>
+          <div class="d">【展开:变更前后 + <b>对结论的影响</b>(若结论依赖此变更,明说)】</div>
+        </div></div>
+        <div class="commit"><div class="no">②</div><div>
+          <div class="t">【最脆证据 —— 具体到卡/来源】</div>
+          <div class="d">【它脆在哪 + 若它塌了结论怎么动】</div>
+        </div></div>
+        <div class="commit"><div class="no">③</div><div>
+          <div class="t">【最可能错在哪 —— 可验证预测】</div>
+          <div class="d">【证伪条件:补齐什么/出现什么,结论向哪移】</div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 论证区:维度型用 .dim 行;类比/对照型再加 .khead/.krow 对比表;详略按 E4 -->
+  <section id="argue">
+    <h2>【论证标题,如「Q1 · 四个维度,三个半成立,一票否决」】</h2>
+    <div class="seclede">【判定表一句复述:什么条件判什么】</div>
+    <div class="card">
+      <div class="dim">
+        <div class="state s-part">◐ 部分成立</div>
+        <div>
+          <h3>【维度名 —— 一句判断】</h3>
+          <p>【论述,关键数字包 <span class="kfig">.kfig</span>】</p>
+          <div class="loss">折损:【如实写弱点,别藏】</div>
+        </div>
+      </div>
+      <!-- 更多 .dim 行 … -->
+    </div>
+  </section>
+
+  <!-- 4. 证据卡:每条结论一张;裁定卡/rule_trace 进折叠区 -->
+  <section id="claims">
+    <h2>证据卡 · 结论各自站在什么上面</h2>
+    <div class="seclede">每张卡:结论 · 强度(按最弱支柱封顶)· 证据链。</div>
+    <div class="cards">
+      <div class="ecard"><div class="top"><span class="cid">C1</span><span class="claim">【结论】</span><span class="strength st-m">MED</span></div><div class="detail">【一句支撑与限定】</div><div class="ev"><span>S01</span><span>S02</span></div></div>
+      <!-- 更多 .ecard … -->
+    </div>
+    <details><summary>【裁定卡与 rule_trace / 逐卡明细】</summary><div class="tbl"><table><tr><th>卡</th><th>内容</th><th>强度依据</th></tr></table></div></details>
+  </section>
+
+  <!-- 5. 边界与缺口:gap 五态 + 过度推断清单 + 折叠来源表 -->
+  <section id="honest">
+    <h2>边界与缺口 · 这篇研究诚实地不知道什么</h2>
+    <div class="seclede">【缺口数】个缺口带五态如实呈现,成稿中不得被"补写"成结论。</div>
+    <div class="gapgrid">
+      <div class="gap"><b>G1 【缺什么】</b><span class="st">gap</span> —— 【影响】</div>
+      <!-- failed 用 <span class="st failed">failed</span> -->
+    </div>
+    <div class="card" style="margin-top:14px">
+      <b>不会写进成稿的过度推断</b>(边界层自我约束):
+      <ul class="dontlist"><li>【不宣称……】</li></ul>
+    </div>
+      <div class="card" style="margin-top:14px">
+        <b>本轮读过的<u>项目目录外</u>路径</b>(机器从 DSH 会话日志取,`session_facts.mjs`;
+        界是 `--project` 那个目录):
+        <div><b>工具包之外(真越界)【N】条</b> —— 逐条全列,不折叠:</div>
+        <ul class="dontlist">
+          <li>【读/写】【工具】【绝对路径】【子代理会话(若来自子代理)】
+              <br><small>【hint(若 json 里这条带 hint,原样抄过来)】</small></li>
+        </ul>
+        <div><b>其余分组里的项目外写入【N】条</b> —— 不论分组,每一条写入都逐条列,不折叠:</div>
+        <ul class="dontlist">
+          <li>【写】【工具】【绝对路径】【scope:harness_temp / other_project / toolkit_internal】【子代理会话(若来自子代理)】</li>
+        </ul>
+        <div>另 【N】 条纯读取(harness 溢写 dsh-spill-* 【N】 · 工具包内别的项目 【N】 ·
+        工具包内部 library/templates/scripts 【N】)—— 明细在 <code>out/session_facts.json</code>。</div>
+        <!-- ⛔ 写入一条都不许折进计数:立规的那个案例 `write scripts/liveness_probe.py` 就是
+             toolkit_internal 的写入(公理 7 违规),折进「工具包内部 N 条」就看不见了。
+             「另 N 条」只数**纯读取**(json 里 action 为「读」、scope 不是 outside_toolkit 的条目)。
+             ⚠️ json 的 toolkit_root 为 null(取不到工具包根)时,条目的 scope 是 unclassified:
+             不分组,把 outside_reads 逐条全列,并写明「取不到工具包根,本次未分组」。
+             ⛔ 这是**下限不是全集**:shell(pwsh / bash)的命令行未解析(本轮 【N】 次调用,
+             json 的 shell_calls),相对路径的读取也不在内。措辞必须写"至少读了这些",不能写"只读了这些"。
+             ⛔ 从 out/session_facts.json 填,不要从控制台回显抄(回显曾截断到前 12 条)。
+             ⛔ 每条要标是**读**还是**写** —— 写到项目目录外是公理 7 违规,标成"读过"就看不出来了。
+             ⛔ 脚本退出码非 0 = 这份 json 不能用:3 = 未取到会话日志(写「未取到会话日志」,
+             不要留空、不要写 0 —— 空清单会被读成没有越界);4 = 结果没写进 json(重跑)。 -->
+      </div>
+    <details><summary>来源登记表(【N】条,均带 URL 与探测状态)</summary><div class="tbl"><table><tr><th>级</th><th>代表来源</th></tr></table></div></details>
+  </section>
+
+  <div class="footer">
+    【窗口名】报告 · 【项目】 · 【对象】v#(hash <span class="num">【前12位】</span>)· 【规模】<br>
+    批准后进入【下一阶段】;对以上任何一处有异议,直接说 —— 改动将按分级重过窗口处理
+  </div>
+</div>

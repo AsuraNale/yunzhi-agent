@@ -1,0 +1,314 @@
+{
+ "schema": "yunzhi.example-fixtures/1",
+ "generator": "app-core/fixtures/make-example.mjs",
+ "fictional": "全部内容为虚构：地名、数字、文件名、网址（example.org）都是编的，只供测试。",
+ "python": "3.12.10",
+ "key": {
+  "key_id": "5016c05c42474424",
+  "signing_key": "test-key/signing-key.pem",
+  "keyring": "test-key/keyring.json",
+  "note": "TEST key, derived from a fixed label: it signed every record here; never the app's own key"
+ },
+ "dsh_home": "dsh-home",
+ "user_name": "研究员",
+ "projects": {
+  "main": {
+   "id": "proj-68ca27a97d9c4bad",
+   "title": "新能源汽车下乡与县域充电设施",
+   "session": "0192f1c4-6b2f-7d5e-8000-00000000c0de",
+   "sessions": [
+    "0192f1c4-6b2f-7d5e-8000-0000000930de",
+    "0192f1c4-6b2f-7d5e-8000-00000000c0de"
+   ]
+  },
+  "county": {
+   "id": "proj-60406b5c4ac62769",
+   "title": "县级财政压力与基层公共服务"
+  },
+  "talent": {
+   "id": "proj-51cce1cabd0e3539",
+   "title": "长三角人才引进政策梳理",
+   "session": "0192c7a1-3d4e-7f00-8000-00000000c1a5"
+  }
+ },
+ "stages": [
+  {
+   "id": "S0",
+   "dir": "S0",
+   "at": "2026-09-30T09:58:00-04:00",
+   "what": "刚新建：只有委托和两份材料",
+   "state": null,
+   "session": null,
+   "pending": null
+  },
+  {
+   "id": "S0b",
+   "dir": "S0b",
+   "at": "2026-09-30T10:02:00-04:00",
+   "what": "开场问完：研究范围和成稿形式已记下，报告类型卡在等",
+   "state": null,
+   "session": "0192f1c4-6b2f-7d5e-8000-0000000930de",
+   "pending": {
+    "kind": "report_type",
+    "card_id": "card-00000000-0000-4000-8000-000000000005",
+    "frame": "S0b/pending/frame.json",
+    "card": "S0b/pending/card.json"
+   }
+  },
+  {
+   "id": "S1",
+   "dir": "S1",
+   "at": "2026-09-30T10:41:00-04:00",
+   "what": "任务计划第 2 版，等第 1 次确认",
+   "state": "gate1_awaiting",
+   "session": "0192f1c4-6b2f-7d5e-8000-0000000930de",
+   "pending": {
+    "kind": "task_plan",
+    "card_id": "card-00000000-0000-4000-8000-000000000007",
+    "frame": "S1/pending/frame.json",
+    "card": "S1/pending/card.json"
+   }
+  },
+  {
+   "id": "S2",
+   "dir": "S2",
+   "at": "2026-10-01T17:05:00-04:00",
+   "what": "收集资料中：第 1 次确认有效，11 张资料卡片",
+   "state": "collecting",
+   "session": "0192f1c4-6b2f-7d5e-8000-00000000c0de",
+   "pending": null
+  },
+  {
+   "id": "S3",
+   "dir": "S3",
+   "at": "2026-10-02T16:06:00-04:00",
+   "what": "资料汇编第 1 版，等第 2 次确认（18 张资料卡片）",
+   "state": "gate2_awaiting",
+   "session": "0192f1c4-6b2f-7d5e-8000-00000000c0de",
+   "pending": {
+    "kind": "dossier",
+    "card_id": "card-00000000-0000-4000-8000-000000000009",
+    "frame": "S3/pending/frame.json",
+    "card": "S3/pending/card.json"
+   }
+  },
+  {
+   "id": "S4",
+   "dir": "S4",
+   "at": "2026-10-03T15:06:00-04:00",
+   "what": "提纲第 3 版，等第 3 次确认",
+   "state": "gate3_awaiting",
+   "session": "0192f1c4-6b2f-7d5e-8000-00000000c0de",
+   "pending": {
+    "kind": "outline",
+    "card_id": "card-00000000-0000-4000-8000-000000000010",
+    "frame": "S4/pending/frame.json",
+    "card": "S4/pending/card.json"
+   }
+  },
+  {
+   "id": "S5",
+   "dir": "S5",
+   "at": "2026-10-05T16:00:00-04:00",
+   "what": "交付前检查中：检查全部通过，独立复核必须改的 0 处，交付卡在等",
+   "state": "verifying",
+   "session": "0192f1c4-6b2f-7d5e-8000-00000000c0de",
+   "pending": {
+    "kind": "delivery",
+    "card_id": "card-00000000-0000-4000-8000-000000000011",
+    "frame": "S5/pending/frame.json",
+    "card": "S5/pending/card.json"
+   }
+  },
+  {
+   "id": "S6",
+   "dir": "S6",
+   "at": "2026-10-05T17:30:00-04:00",
+   "what": "已交付",
+   "state": "delivered",
+   "session": "0192f1c4-6b2f-7d5e-8000-00000000c0de",
+   "pending": null
+  },
+  {
+   "id": "S2-flow",
+   "dir": "S2-flow",
+   "at": "2026-10-01T17:25:00-04:00",
+   "what": "另一条分支：S2 之后用户说「不用拟提纲了」，改流程卡在等",
+   "state": "collecting",
+   "session": "0192f1c4-6b2f-7d5e-8000-00000000c0de",
+   "pending": {
+    "kind": "flow_change",
+    "card_id": "card-00000000-0000-4000-8000-000000000012",
+    "frame": "S2-flow/pending/frame.json",
+    "card": "S2-flow/pending/card.json"
+   },
+   "branch_of": "S2"
+  }
+ ],
+ "frames": [
+  {
+   "file": "frames/01-report_type.json",
+   "project_id": "proj-51cce1cabd0e3539",
+   "kind": "report_type",
+   "gate_id": "talent-report-type",
+   "shown_at": "2026-09-21T10:10:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000001",
+   "answer": {
+    "at": "2026-09-21T10:12:00-04:00",
+    "choice": "survey",
+    "note": null,
+    "advanced_to": null
+   }
+  },
+  {
+   "file": "frames/02-task_plan.json",
+   "project_id": "proj-51cce1cabd0e3539",
+   "kind": "task_plan",
+   "gate_id": "talent-task-plan",
+   "shown_at": "2026-09-21T10:31:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000002",
+   "answer": {
+    "at": "2026-09-21T10:35:00-04:00",
+    "choice": "confirm",
+    "note": "可以。",
+    "advanced_to": "collecting"
+   }
+  },
+  {
+   "file": "frames/03-dossier.json",
+   "project_id": "proj-51cce1cabd0e3539",
+   "kind": "dossier",
+   "gate_id": "talent-dossier",
+   "shown_at": "2026-09-23T11:01:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000003",
+   "answer": {
+    "at": "2026-09-23T14:00:00-04:00",
+    "choice": "confirm",
+    "note": null,
+    "advanced_to": "drafting"
+   }
+  },
+  {
+   "file": "frames/04-delivery.json",
+   "project_id": "proj-51cce1cabd0e3539",
+   "kind": "delivery",
+   "gate_id": "talent-delivery",
+   "shown_at": "2026-09-26T16:50:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000004",
+   "answer": {
+    "at": "2026-09-26T17:00:00-04:00",
+    "choice": "deliver",
+    "note": null,
+    "advanced_to": "delivered"
+   }
+  },
+  {
+   "file": "frames/05-report_type.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "report_type",
+   "gate_id": "report-type",
+   "shown_at": "2026-09-30T10:02:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000005",
+   "answer": {
+    "at": "2026-09-30T10:05:00-04:00",
+    "choice": "judge",
+    "note": null,
+    "advanced_to": null
+   }
+  },
+  {
+   "file": "frames/06-task_plan.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "task_plan",
+   "gate_id": "task-plan",
+   "shown_at": "2026-09-30T10:13:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000006",
+   "answer": {
+    "at": "2026-09-30T10:20:00-04:00",
+    "choice": "not_yet",
+    "note": "时间段改成 2021 开始。",
+    "advanced_to": null
+   }
+  },
+  {
+   "file": "frames/07-task_plan.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "task_plan",
+   "gate_id": "task-plan",
+   "shown_at": "2026-09-30T10:41:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000007",
+   "answer": {
+    "at": "2026-09-30T10:43:00-04:00",
+    "choice": "confirm",
+    "note": "时间段改成 2021 开始，其余可以。",
+    "advanced_to": "collecting"
+   }
+  },
+  {
+   "file": "frames/08-decision.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "decision",
+   "gate_id": "decision-2021-data",
+   "shown_at": "2026-10-01T16:50:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000008",
+   "answer": {
+    "at": "2026-10-01T17:05:00-04:00",
+    "choice": "1",
+    "note": null,
+    "advanced_to": null
+   }
+  },
+  {
+   "file": "frames/09-dossier.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "dossier",
+   "gate_id": "dossier",
+   "shown_at": "2026-10-02T16:06:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000009",
+   "answer": {
+    "at": "2026-10-02T17:20:00-04:00",
+    "choice": "confirm",
+    "note": null,
+    "advanced_to": "outlining"
+   }
+  },
+  {
+   "file": "frames/10-outline.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "outline",
+   "gate_id": "outline",
+   "shown_at": "2026-10-03T15:06:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000010",
+   "answer": {
+    "at": "2026-10-03T15:10:00-04:00",
+    "choice": "confirm",
+    "note": null,
+    "advanced_to": "drafting"
+   }
+  },
+  {
+   "file": "frames/11-delivery.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "delivery",
+   "gate_id": "delivery",
+   "shown_at": "2026-10-05T16:00:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000011",
+   "answer": {
+    "at": "2026-10-05T17:30:00-04:00",
+    "choice": "deliver",
+    "note": null,
+    "advanced_to": "delivered"
+   }
+  },
+  {
+   "file": "frames/12-flow_change.json",
+   "project_id": "proj-68ca27a97d9c4bad",
+   "kind": "flow_change",
+   "gate_id": "flow-change",
+   "shown_at": "2026-10-01T17:25:00-04:00",
+   "card_id": "card-00000000-0000-4000-8000-000000000012",
+   "answer": null,
+   "branch": "S2-flow"
+  }
+ ]
+}

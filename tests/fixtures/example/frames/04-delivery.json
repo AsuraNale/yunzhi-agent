@@ -1,0 +1,31 @@
+{
+ "v": 1,
+ "type": "question",
+ "request_id": "req-fixture-004",
+ "question_id": "q-fixture-004",
+ "gate_card": true,
+ "questions": [
+  {
+   "id": "ann-gate:talent-delivery",
+   "question": "Deliver the draft?",
+   "options": [
+    {
+     "label": "deliver"
+    },
+    {
+     "label": "not_yet"
+    }
+   ],
+   "multi_select": false,
+   "gate": {
+    "gate_id": "talent-delivery",
+    "call_id": "call-fixture-004",
+    "kind": "delivery",
+    "approve": "deliver"
+   },
+   "card": {
+    "kind": "delivery"
+   }
+  }
+ ]
+}
